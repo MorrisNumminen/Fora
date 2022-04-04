@@ -1,6 +1,8 @@
-﻿namespace Fora.Shared
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Fora.Shared
 {
-    public class UserModel
+    public class UserModel 
     {
         public int Id { get; set; }
         public string Username { get; set; } = String.Empty;
