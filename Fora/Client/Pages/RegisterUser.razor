@@ -1,0 +1,42 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Fora.Client.Services
+@using Fora.Shared
+@inject IUserManager UserManager
+@page "/register"
+
+<h3>RegisterUser</h3>
+
+@*<div>
+    <form method="post">
+        <input  id="username" type="text" placeholder="Username"/>
+        <input id="password" type="password" placeholder="Password" />
+        <input id="confpassword"type="password" placeholder="Confirm Password"/>
+        <button type="submit"> Tryck Mig </button>
+       
+    </form>
+</div>*@
+
+<EditForm Model="@User" OnSubmit="RegUser">
+    <InputText @bind-Value="User.Username" placeholder="Username"></InputText>
+    <InputText @bind-Value="User.Password" placeholder="Password"></InputText>
+    <button type="submit">Register</button>
+</EditForm>
+
+
+@code {
+    public UserDto User { get; set; } = new();
+
+    private void RegUser()
+    {
+        UserManager.RegisterUser(User);
+    }
+        
+        // Skapa formulär med validation
+        // Skicka användarnamn och lösenord till en service
+
+        // Servicen call:ar API:t
+        // API:t skapar en token ( string token = Guid.NewGuid(); )
+        // API:t lägger till token till användaren i databasen
+        // API:t skickar tillbaka token till clienten ( return Ok(token); )
+        // Clienten lägger token i LocalStorage
+}

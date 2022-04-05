@@ -6,6 +6,6 @@ namespace Fora.Server.Models
     {
 
         public string Token { get; set; }
-
+        
     }
 }
