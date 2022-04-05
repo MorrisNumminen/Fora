@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Fora.Server.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +10,13 @@ namespace Fora.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
+        public UsersController(SignInManager<ApplicationUser> signInManager)
+        {
+            _signInManager = signInManager;
+        }
+
         // GET: api/<UsersController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -24,8 +33,44 @@ namespace Fora.Server.Controllers
 
         // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] UserDto userToRegister)
+        public async Task<ActionResult<string>> SignUpAsync([FromBody] UserDto userToRegister)
         {
+            ApplicationUser newUser = new();
+            newUser.UserName = userToRegister.Username;
+
+            var createUserResult = await _signInManager.UserManager.CreateAsync(newUser, userToRegister.Password);
+
+            // Check createUserResult
+            if (createUserResult.Succeeded)
+            {
+                string token = Guid.NewGuid().ToString();
+
+                // Add the new token to the user in the identity db
+
+                newUser.Token = token;
+
+                await _signInManager.UserManager.UpdateAsync(newUser);
+
+                return Ok(token);
+
+            }
+            return BadRequest("Could not create a user");
+            // Create token
+            // Add that token to the Identity Db
+            // Add the new user to the other db too
+            // Send token back
+
+
+        }
+            public void Post([FromBody] UserDto userToRegister)
+        {
+            // Calla Api
+
+
+
+
+
+           
         }
 
         // PUT api/<UsersController>/5

@@ -16,6 +16,7 @@ namespace Fora.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             // Many to many (users can have many interests that in turns have many users)
             modelBuilder.Entity<UserInterestModel>()
                 .HasKey(ui => new { ui.UserId, ui.InterestId });

@@ -4,6 +4,6 @@ namespace Fora.Client.Services
 {
     public interface IUserManager
     {
-        void RegisterUser(UserDto user);
+        Task RegisterUser(UserDto user);
     }
 }

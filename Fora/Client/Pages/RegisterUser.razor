@@ -2,23 +2,15 @@
 @using Fora.Client.Services
 @using Fora.Shared
 @inject IUserManager UserManager
-@page "/register"
+@page "/registeruser"
 
 <h3>RegisterUser</h3>
 
-@*<div>
-    <form method="post">
-        <input  id="username" type="text" placeholder="Username"/>
-        <input id="password" type="password" placeholder="Password" />
-        <input id="confpassword"type="password" placeholder="Confirm Password"/>
-        <button type="submit"> Tryck Mig </button>
-       
-    </form>
-</div>*@
+
 
 <EditForm Model="@User" OnSubmit="RegUser">
-    <InputText @bind-Value="User.Username" placeholder="Username"></InputText>
-    <InputText @bind-Value="User.Password" placeholder="Password"></InputText>
+    <InputText @bind-Value="User.Username" type="text" placeholder="Username"></InputText>
+    <InputText @bind-Value="User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Register</button>
 </EditForm>
 
@@ -31,8 +23,8 @@
         UserManager.RegisterUser(User);
     }
         
-        // Skapa formulär med validation
-        // Skicka användarnamn och lösenord till en service
+        // Skapa formulär med validation Check
+        // Skicka användarnamn och lösenord till en service Check
 
         // Servicen call:ar API:t
         // API:t skapar en token ( string token = Guid.NewGuid(); )
