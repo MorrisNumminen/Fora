@@ -61,24 +61,24 @@ namespace Fora.Server.Controllers
 
 
         }
-        //[HttpPost("login")]
+        [HttpPost("login")]
 
-        //public async Task<IActionResult> Post([FromBody] UserDto userToLogin)
-        //{
-        //    // Calla Api
+        public async Task<IActionResult> Post([FromBody] UserDto userToLogin)
+        {
+            // Calla Api
 
-        //    var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
+            var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
 
-        //    if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
-        //    {
+            if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
+            {
 
 
-        //        return Ok(user);
-        //    }
+                return Ok(user);
+            }
 
-        //    return BadRequest("Could not login");
+            return BadRequest("Could not login");
 
-        //}
+        }
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]

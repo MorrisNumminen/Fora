@@ -9,21 +9,21 @@
 
 <h3>Login</h3>
 
-@*<EditForm Model="@User" OnSubmit="LogInUser">
+<EditForm Model="@User" OnSubmit="LogInUser">
     <InputText @bind-Value="@User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="@User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Log In</button>
-</EditForm>*@
+</EditForm>
 
 @code {
 
-    //public UserDto User { get; set; } = new();
+    public UserDto User { get; set; } = new();
 
 
 
     private async Task LogInUser()
     {
-        //UserManager.RegisterUser(User);
+        UserManager.LogInUser(User);
     }
 
 
