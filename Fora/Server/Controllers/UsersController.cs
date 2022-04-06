@@ -1,5 +1,4 @@
-﻿using Fora.Server.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -62,16 +61,24 @@ namespace Fora.Server.Controllers
 
 
         }
-            public void Post([FromBody] UserDto userToRegister)
-        {
-            // Calla Api
+        //[HttpPost("login")]
+
+        //public async Task<IActionResult> Post([FromBody] UserDto userToLogin)
+        //{
+        //    // Calla Api
+
+        //    var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
+
+        //    if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
+        //    {
 
 
+        //        return Ok(user);
+        //    }
 
+        //    return BadRequest("Could not login");
 
-
-           
-        }
+        //}
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]

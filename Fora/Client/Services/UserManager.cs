@@ -16,9 +16,16 @@ namespace Fora.Client.Services
         {
             // Registrera användare i API:t
 
-            var result = await _http.PostAsJsonAsync<UserDto>("api/users", userToRegister);
+            await _http.PostAsJsonAsync<UserDto>("api/users", userToRegister);
 
+            // var result =
 
         }
+
+        //public async Task LogInUser(UserDto userToLogin)
+        //{
+        //    await _http.PostAsJsonAsync<UserDto>("api/users/login", userToLogin);
+        //}
+
     }
 }
