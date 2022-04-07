@@ -9,6 +9,7 @@ namespace Fora.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UsersController(SignInManager<ApplicationUser> signInManager)
@@ -61,17 +62,22 @@ namespace Fora.Server.Controllers
 
 
         }
+
+
         [HttpPost("login")]
 
-        public async Task<IActionResult> Post([FromBody] UserDto userToLogin)
+        public async Task<IActionResult> LoginAsync([FromBody] UserDto userToLogin)
         {
             // Calla Api
+
+
 
             var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
 
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
 
+                //await _signInManager.UserManager.UpdateAsync(user);
 
                 return Ok(user);
             }
@@ -84,6 +90,9 @@ namespace Fora.Server.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
+
+
+
         }
 
         // DELETE api/<UsersController>/5
