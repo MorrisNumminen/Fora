@@ -1,0 +1,21 @@
+﻿@using System;
+@using System.Collections.Generic;
+@page "/usersettings"
+<h3>User Settings</h3>
+
+@foreach(string element in testInterests)
+{
+    if( element != null)
+    {
+        <ul>@element</ul>
+    }
+
+}
+
+@code {
+
+    public string[] testInterests = {"Interest 1", "Interest 2", "Interest 3", "", "", "Interest 4" };
+
+
+
+}
