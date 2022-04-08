@@ -1,4 +1,5 @@
 ﻿using Fora.Shared;
+using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace Fora.Client.Services
@@ -12,20 +13,34 @@ namespace Fora.Client.Services
             _http = http;
         }
 
-        public async Task RegisterUser(UserDto userToRegister)
+        public async Task<string> RegisterUser(UserDto userToRegister)
         {
             // Registrera användare i API:t
 
-            await _http.PostAsJsonAsync<UserDto>("api/users", userToRegister);
+            var response = await _http.PostAsJsonAsync<UserDto>("api/users", userToRegister);
 
-            // var result =
+            var token = await response.Content.ReadAsStringAsync();
+
+            return token;
         }
 
-        public async Task LogInUser(UserDto userToLogin)
+        public async Task<string> LogInUser(UserDto userToLogin)
         {
             //Logga in användare
-            await _http.PostAsJsonAsync<UserDto>("api/users/login", userToLogin);
+            var response = await _http.PostAsJsonAsync<UserDto>("api/users/login", userToLogin);
+
+            string token = await response.Content.ReadAsStringAsync();
+
+            return token;
         }
 
+        public async Task<LoginDto> CheckUserLogin(string token)
+        {
+            // Use token to check user status (logged in, admin, banned, deleted...)
+
+            var response = await _http.GetFromJsonAsync<LoginDto>($"api/users/check?accessToken={token}");
+
+            return response;
+        }
     }
 }

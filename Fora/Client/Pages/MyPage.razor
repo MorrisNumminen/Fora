@@ -1,0 +1,40 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject IUserManager UserManager
+@using Blazored.LocalStorage
+@using Fora.Client.Services
+@using Fora.Shared
+@page "/mypage"
+
+<h3>MyPage</h3>
+
+
+@if(loginStatus.IsLoggedIn)
+{
+    <h1>You only see this because you're logged in</h1>
+
+    @if(loginStatus.IsAdmin)
+    {
+        <h1>You only see this because you're an admin</h1>
+    }
+}
+
+
+@code {
+    private LoginDto? loginStatus;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Hämta token från Local Storage
+        // 2. Skicka token till API för att kolla om vi är inloggade
+        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+        // 4. Rendera endast delar av sidan beroende på om vi är inloggade eller inte (boolen)
+
+        // 1
+
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        // 2 
+
+        loginStatus = await UserManager.CheckUserLogin(token);
+    }
+}
