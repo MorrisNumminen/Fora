@@ -4,9 +4,13 @@
 @inject IUserManager UserManager
 @page "/registeruser"
 
-<h3>RegisterUser</h3>
+<style>
+body {
+  background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
+}
+</style>
 
-
+<h3 style="font-family: 'Comic Sans MS';">Register a User</h3>
 
 <EditForm Model="@User" OnSubmit="RegUser">
     <InputText @bind-Value="User.Username" type="text" placeholder="Username"></InputText>

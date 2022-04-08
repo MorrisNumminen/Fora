@@ -1,11 +1,19 @@
-﻿@using Microsoft.AspNetCore.Identity;
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Identity;
 @using System.ComponentModel.DataAnnotations
 @using Fora.Client.Services
 @using Fora.Shared
 @inject IUserManager UserManager
+@inject ILocalStorageService LocalStorage
 @page "/login"
 
 <PageTitle>LoginPage</PageTitle>
+
+<style>
+body {
+  background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
+}
+</style>
 
 <h3>Login</h3>
 
@@ -23,7 +31,23 @@
 
     private async Task LogInUser()
     {
-        UserManager.LogInUser(User);
+        var token = await UserManager.LogInUser(User);
+
+        // Add the token to the local storage
+        await LocalStorage.SetItemAsStringAsync("token", token);
+
+        // Get token from LS
+
+        var tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
+
+        if(tokenFromLocalStorage == null)
+        {
+            
+        }
+        else 
+        {
+            // Get stuff from api with the token as key
+        }
     }
 
 

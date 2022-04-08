@@ -4,7 +4,8 @@ namespace Fora.Client.Services
 {
     public interface IUserManager
     {
-        Task RegisterUser(UserDto user);
-        Task LogInUser(UserDto userToLogin);
+        Task<string> RegisterUser(UserDto user);
+        Task<string> LogInUser(UserDto userToLogin);
+        Task<LoginDto> CheckUserLogin(string token);
     }
 }
