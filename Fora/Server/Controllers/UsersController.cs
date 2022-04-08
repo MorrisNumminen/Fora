@@ -65,25 +65,47 @@ namespace Fora.Server.Controllers
 
 
         [HttpPost("login")]
-
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userToLogin)
         {
             // Calla Api
-
-
 
             var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
 
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
-
                 //await _signInManager.UserManager.UpdateAsync(user);
-
-                return Ok(user);
-            }
+   
+                return Ok(user.Token);
+            }            
 
             return BadRequest("Could not login");
+        }
 
+        [HttpGet]
+        [Route("check")]
+        public async Task<LoginDto> CheckUserLogin([FromQuery] string token)
+        {
+            // See what user has the specified token (in the db)
+
+            LoginDto loginStatus = new();
+
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+
+            if(userWithToken != null)
+            {
+                loginStatus.IsLoggedIn = true;
+
+                // Is user admin?
+
+                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "Admin");
+
+                if(roleCheckResult)
+                {
+                    loginStatus.IsAdmin = true;
+                }
+            }
+
+            return loginStatus;
         }
 
         // PUT api/<UsersController>/5
