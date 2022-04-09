@@ -1,0 +1,34 @@
+﻿@using Fora.Shared
+
+<PageTitle>Intrests</PageTitle>
+<style>
+body {
+  background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
+}
+</style>
+
+@page "/intrests"
+
+
+<h3>Intrests</h3>
+
+@foreach( var intrests in userInterestsPLaceHolder)
+{
+    @intrests;
+    <br/>
+}
+
+@code {
+
+    public List<string> userInterestsPLaceHolder = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInterestsPLaceHolder.Add("Souls like games");
+        userInterestsPLaceHolder.Add("Rouge Like");
+        userInterestsPLaceHolder.Add("FPS");
+        userInterestsPLaceHolder.Add("Brawlers");
+    }
+
+}

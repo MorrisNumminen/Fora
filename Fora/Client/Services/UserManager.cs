@@ -1,5 +1,4 @@
 ﻿using Fora.Shared;
-using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace Fora.Client.Services
