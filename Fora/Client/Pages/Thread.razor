@@ -1,0 +1,30 @@
+﻿@using Fora.Shared
+
+<PageTitle>Thread</PageTitle>
+<style>
+body {
+  background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
+}
+</style>
+
+@page "/thread"
+
+<h3>Thread</h3>
+
+@foreach( var msg in msgPLaceHolder)
+{
+    @msg;
+    <br/>
+}
+
+@code {
+        //placeholder list
+    public List<string> msgPLaceHolder = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        msgPLaceHolder.Add("Dark souls 3 is king");
+    }
+
+}
