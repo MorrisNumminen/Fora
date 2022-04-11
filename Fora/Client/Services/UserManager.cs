@@ -41,5 +41,15 @@ namespace Fora.Client.Services
 
             return response;
         }
+
+        public async Task<string> CreateInterest(InterestModel interestToAdd)
+        {
+            //skapa interest
+            var response = await _http.PostAsJsonAsync<InterestModel>("api/users/createInterest", interestToAdd);
+
+            string interestId = await response.Content.ReadAsStringAsync();
+
+            return interestId;
+        }
     }
 }

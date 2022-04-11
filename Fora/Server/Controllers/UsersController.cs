@@ -60,7 +60,6 @@ namespace Fora.Server.Controllers
             // Add the new user to the other db too
             // Send token back
 
-
         }
 
 
@@ -74,9 +73,9 @@ namespace Fora.Server.Controllers
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
                 //await _signInManager.UserManager.UpdateAsync(user);
-   
+
                 return Ok(user.Token);
-            }            
+            }
 
             return BadRequest("Could not login");
         }
@@ -91,7 +90,7 @@ namespace Fora.Server.Controllers
 
             var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
 
-            if(userWithToken != null)
+            if (userWithToken != null)
             {
                 loginStatus.IsLoggedIn = true;
 
@@ -99,7 +98,7 @@ namespace Fora.Server.Controllers
 
                 var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "Admin");
 
-                if(roleCheckResult)
+                if (roleCheckResult)
                 {
                     loginStatus.IsAdmin = true;
                 }
@@ -108,16 +107,8 @@ namespace Fora.Server.Controllers
             return loginStatus;
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
 
-
-
-        }
-
-        // DELETE api/<UsersController>/5
+        //DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
