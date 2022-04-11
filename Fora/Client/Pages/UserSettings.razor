@@ -1,21 +1,62 @@
 ﻿@using System;
 @using System.Collections.Generic;
+@using Fora.Client.Services
+@using Fora.Shared;
+@inject IUserManager UserManager
+@inject IInterestManager InterestManager
 @page "/usersettings"
+
 <h3>User Settings</h3>
 
-@foreach(string element in testInterests)
+<h5>Interests</h5>
+<h3>@loadingMessage</h3>
+@foreach (var element in interests)
 {
-    if( element != null)
-    {
-        <ul>@element</ul>
-    }
-
+    <ul>@element.Name</ul>
 }
+
+
+<h2> Create a new interest</h2>
+@*<EditForm Model="@InterestToAdd" OnSubmit="CreateNewInterest">
+    <InputText @bind-Value="InterestToAdd.Name" type="text" placeholder="Name of interest"></InputText>
+    <button type="submit">Create</button>
+</EditForm>*@
+
+
+
+@*
+● Se intressen man har på sin användare
+● Se alla intressen som finns på appen
+● Skapa nya intressen
+● Lägga till redan existerande intressen till sin användare
+● Ta bort intressen från sin användare
+● Ta bort intressen man själv skapat från appen
+● Byta lösenord
+● Se, ändra och ta bort profilbild
+● Ta bort intressen om man är admin
+● Se om man är admin
+● Tilldela adminrättigheter till andra användare om man är admin
+● Ta bort adminrättigheter från andra användare om man är admin
+● Banna andra användare om man är admin
+● Avbanna andra användare om man är admin
+● Möjligheten bestämma målspråk för översättning (se avsnittet “Bedömning - Niceto-have” nedan)
+● Se trådar man skapat
+● Flagga sin användare som borttagen
+● Ta bort sitt användare*@
+
+
 
 @code {
 
-    public string[] testInterests = {"Interest 1", "Interest 2", "Interest 3", "", "", "Interest 4" };
+    public List<InterestModel> interests = new();
 
+    string loadingMessage;
 
+    protected override async Task OnInitializedAsync()
+    {
+        loadingMessage = "Loading interests...";
+        interests = await InterestManager.GetInterests();
+        loadingMessage = "Finished loading!";
 
+    }
 }

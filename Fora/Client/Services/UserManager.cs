@@ -1,5 +1,4 @@
 ﻿using Fora.Shared;
-using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace Fora.Client.Services
@@ -41,6 +40,16 @@ namespace Fora.Client.Services
             var response = await _http.GetFromJsonAsync<LoginDto>($"api/users/check?accessToken={token}");
 
             return response;
+        }
+
+        public async Task<string> CreateInterest(InterestModel interestToAdd)
+        {
+            //skapa interest
+            var response = await _http.PostAsJsonAsync<InterestModel>("api/users/createInterest", interestToAdd);
+
+            string interestId = await response.Content.ReadAsStringAsync();
+
+            return interestId;
         }
     }
 }
