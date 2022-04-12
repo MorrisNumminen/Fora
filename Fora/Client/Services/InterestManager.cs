@@ -16,15 +16,13 @@ namespace Fora.Client.Services
             return await _httpClient.GetFromJsonAsync<List<InterestModel>>("api/Interests/getinterests");
         }
 
-        public async Task<string> CreateInterest(InterestModel interestToCreate)
+        public async Task<string> CreateInterest(InterestModel interestToCreate, string token)
         {
-            // Lägg till 
+            // Lägg till ett interest i db
 
-            var response = await _httpClient.PostAsJsonAsync<InterestModel>("api/createinterest", interestToCreate);
+            var response = await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/createinterest?token={token}", interestToCreate);
 
-            var result = await response.Content.ReadAsStringAsync();
-
-            return result;
+            return null;
         }
 
     }

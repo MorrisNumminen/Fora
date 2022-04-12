@@ -17,10 +17,10 @@
 
 
 <h2> Create a new interest</h2>
-@*<EditForm Model="@InterestToAdd" OnSubmit="CreateNewInterest">
-    <InputText @bind-Value="InterestToAdd.Name" type="text" placeholder="Name of interest"></InputText>
+<EditForm Model="@Interest" OnSubmit="CreateNewInterest">
+    <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
     <button type="submit">Create</button>
-</EditForm>*@
+</EditForm>
 
 
 
@@ -50,6 +50,8 @@
 
     public List<InterestModel> interests = new();
 
+    public InterestModel Interest { get; set; } = new();
+
     string loadingMessage;
 
     protected override async Task OnInitializedAsync()
@@ -57,6 +59,14 @@
         loadingMessage = "Loading interests...";
         interests = await InterestManager.GetInterests();
         loadingMessage = "Finished loading!";
-
     }
+
+    public void CreateNewInterest()
+    {
+        // Get token
+        // Send it together with the interest to the api
+
+        InterestManager.CreateInterest(Interest, "token som vi hämtat");
+    }
+
 }

@@ -6,5 +6,7 @@ namespace Fora.Client.Services
     {
         Task<List<InterestModel>> GetInterests();
 
+        Task<string> CreateInterest(InterestModel interestToCreate, string token);
+
     }
 }

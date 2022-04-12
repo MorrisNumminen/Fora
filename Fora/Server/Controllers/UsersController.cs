@@ -11,10 +11,12 @@ namespace Fora.Server.Controllers
     {
 
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AppDbContext _context;
 
-        public UsersController(SignInManager<ApplicationUser> signInManager)
+        public UsersController(SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
             _signInManager = signInManager;
+            _context = context;
         }
 
         // GET: api/<UsersController>
@@ -43,6 +45,12 @@ namespace Fora.Server.Controllers
             // Check createUserResult
             if (createUserResult.Succeeded)
             {
+                _context.Users.Add(new UserModel()
+                {
+                    Username = "Albin1337"
+                });
+                await _context.SaveChangesAsync();
+
                 string token = Guid.NewGuid().ToString();
 
                 // Add the new token to the user in the identity db
