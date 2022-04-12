@@ -1,4 +1,7 @@
-﻿@using Fora.Shared
+﻿@using Microsoft.AspNetCore.Identity;
+@using System.ComponentModel.DataAnnotations
+@using Fora.Client.Services
+@using Fora.Shared
 
 <PageTitle>Threads</PageTitle>
 
@@ -10,22 +13,76 @@ body {
 
 @page "/threads"
 
+@*<form onsubmit="@OnSearch">
+    <label for="searchStr"> Search: </label>
+    <input type="text" id="searchStr"/>
+    <input type="submit" />
+</form>*@
+
+<EditForm Model=Intrests OnSubmit="@(OnSearch)">
+    <label for="search">Search</label>
+    <InputText @bind-Value=(SearchTerm)></InputText>
+    <input type="submit" />
+</EditForm>
 
 <h3>Threads</h3>
 
-@foreach( var threads in ThreadsPLaceHolder)
+@if(SearchList.Count() == 0)
 {
-    @threads;
-    <br/>
+    foreach(var thread in ThreadsList)
+    {
+        <a href="thread">@thread</a>
+        <br/>
+    }
+}
+else if (SearchList.Count() > 0)
+{
+    foreach(var searchThread in SearchList)
+    {
+        <a href="thread">@searchThread</a>
+        <br/>
+    }
 }
 
+
 @code {
+    //hämta ut alla namn(strings) på threads från den riktiga listan och spara det i en ny lista
+    //sortera den listan och loopa igenom den för att visa namnen med html
+    //
     //placeholder List
-    public List<string> ThreadsPLaceHolder = new();
+
+    public Fora.Shared.InterestModel Intrests { get; set; } = new();
+
+    private string SearchTerm  { get; set; }
+
+    public List<string> ThreadsList = new();
+
+    public List<string> SearchList = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ThreadsPLaceHolder.Add("Best souls like games");
-        ThreadsPLaceHolder.Add("Who is your daddy? And why is it me?");
+        ThreadsList.Add(Intrests.Name);
+        ThreadsList.Add("Best souls like game");
+        ThreadsList.Add("Who is your daddy? And why is it me?");
+        ThreadsList.Add("Worst souls like game");
+        ThreadsList.Add("a");
+        ThreadsList.Add("z");
+        ThreadsList.Sort();
     }
+
+    public async Task OnSearch()
+    {
+        //hur ska jag får sidan att uppdateras dynamiskt?
+        //todo: adda msgs till varje thread
+        //fixa med bannade/bortagna users
+
+        //foreach(var thread in ThreadsList)
+        //{
+        //    SearchList = ThreadsList.Where(x => x.Contains(searchTerm)).ToList();
+        //}
+
+        SearchList = ThreadsList.Where(s => s.Contains(SearchTerm)).ToList();
+        StateHasChanged();
+    }
+
 }
