@@ -2,8 +2,10 @@
 @using System.Collections.Generic;
 @using Fora.Client.Services
 @using Fora.Shared;
-@inject IUserManager UserManager
-@inject IInterestManager InterestManager
+@using Blazored.LocalStorage
+@inject IUserManager UserManager;
+@inject IInterestManager InterestManager;
+@inject ILocalStorageService LocalStorage;
 @page "/usersettings"
 
 <h3>User Settings</h3>
@@ -54,6 +56,8 @@
 
     string loadingMessage;
 
+    string tokenFromLocalStorage = "Före token";
+
     protected override async Task OnInitializedAsync()
     {
         loadingMessage = "Loading interests...";
@@ -61,12 +65,13 @@
         loadingMessage = "Finished loading!";
     }
 
-    public void CreateNewInterest()
+    public async void CreateNewInterest()
     {
         // Get token
-        // Send it together with the interest to the api
+        tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
-        InterestManager.CreateInterest(Interest, "token som vi hämtat");
+        // Skickar token tillsammans med Interest objekt
+        InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
     }
 
 }

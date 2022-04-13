@@ -17,20 +17,18 @@ body {
 
 <h3>Login</h3>
 
-<EditForm Model="@User" On>
+<EditForm Model="@User" OnSubmit="LogInUser">
     <InputText @bind-Value="@User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="@User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Log In</button>
 </EditForm>
 
 @code {
-
     public UserDto User { get; set; } = new();
-
-
 
     private async Task LogInUser()
     {
+        Console.WriteLine("click");
         var token = await UserManager.LogInUser(User);
 
         // Add the token to the local storage

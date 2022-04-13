@@ -47,9 +47,11 @@ namespace Fora.Server.Controllers
             {
                 _context.Users.Add(new UserModel()
                 {
-                    Username = "Albin1337"
+                    Username = userToRegister.Username
                 });
                 await _context.SaveChangesAsync();
+
+                // Token
 
                 string token = Guid.NewGuid().ToString();
 
@@ -60,14 +62,12 @@ namespace Fora.Server.Controllers
                 await _signInManager.UserManager.UpdateAsync(newUser);
 
                 return Ok(token);
-
             }
             return BadRequest("Could not create a user");
             // Create token
             // Add that token to the Identity Db
             // Add the new user to the other db too
             // Send token back
-
         }
 
 
