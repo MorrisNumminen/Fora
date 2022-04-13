@@ -10,7 +10,6 @@ body {
   background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
 }
 </style>
-
 @page "/threads"
 
 @*<form onsubmit="@OnSearch">
@@ -21,7 +20,7 @@ body {
 
 <EditForm Model=Intrests OnSubmit="@(OnSearch)">
     <label for="search">Search</label>
-    <InputText @bind-Value=(SearchTerm)></InputText>
+    <InputText PlaceHolder="CaseSensetive!" @bind-Value=(SearchTerm)></InputText>
     <input type="submit" />
 </EditForm>
 
@@ -53,7 +52,7 @@ else if (SearchList.Count() > 0)
 
     public Fora.Shared.InterestModel Intrests { get; set; } = new();
 
-    private string SearchTerm  { get; set; }
+    private string SearchTerm { get; set; } = string.Empty;
 
     public List<string> ThreadsList = new();
 
@@ -72,14 +71,8 @@ else if (SearchList.Count() > 0)
 
     public async Task OnSearch()
     {
-        //hur ska jag får sidan att uppdateras dynamiskt?
         //todo: adda msgs till varje thread
         //fixa med bannade/bortagna users
-
-        //foreach(var thread in ThreadsList)
-        //{
-        //    SearchList = ThreadsList.Where(x => x.Contains(searchTerm)).ToList();
-        //}
 
         SearchList = ThreadsList.Where(s => s.Contains(SearchTerm)).ToList();
         StateHasChanged();
