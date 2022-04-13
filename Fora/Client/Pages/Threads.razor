@@ -2,6 +2,12 @@
 @using System.ComponentModel.DataAnnotations
 @using Fora.Client.Services
 @using Fora.Shared
+@using Blazored.LocalStorage
+@inject IThreadManager ThreadManager;
+@inject IUserManager UserManager;
+@inject ILocalStorageService LocalStorage;
+@page "/threads"
+
 
 <PageTitle>Threads</PageTitle>
 
@@ -10,27 +16,40 @@ body {
   background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
 }
 </style>
-@page "/threads"
 
-@*<form onsubmit="@OnSearch">
+@*
+<form onsubmit="@OnSearch">
     <label for="searchStr"> Search: </label>
     <input type="text" id="searchStr"/>
     <input type="submit" />
-</form>*@
+</form>
 
-<EditForm Model=Intrests OnSubmit="@(OnSearch)">
+<EditForm Model=@Thread OnSubmit="@(OnSearch)">
     <label for="search">Search</label>
     <InputText PlaceHolder="CaseSensetive!" @bind-Value=(SearchTerm)></InputText>
     <input type="submit" />
 </EditForm>
-
+*@
 <h3>Threads</h3>
 
+<h4>Start A Topic</h4>
+<EditForm Model="@Thread" OnSubmit="CreateNewThread">
+    <InputText @bind-Value="Thread.Name" type="text" placeholder="Title for thread"></InputText>
+    <button type="submit">Start topic!</button>
+</EditForm>
+
+@foreach(var thread in ThreadsList)
+    {
+        <a class="btn-outline-light" href="thread">@thread.Name</a>
+        <br/>
+    }
+
+@*
 @if(SearchList.Count() == 0)
 {
     foreach(var thread in ThreadsList)
     {
-        <a href="thread">@thread</a>
+        <a href="thread">@thread.Name</a>
         <br/>
     }
 }
@@ -42,40 +61,51 @@ else if (SearchList.Count() > 0)
         <br/>
     }
 }
-
+*@
 
 @code {
     //hämta ut alla namn(strings) på threads från den riktiga listan och spara det i en ny lista
     //sortera den listan och loopa igenom den för att visa namnen med html
-    //
+
     //placeholder List
 
-    public Fora.Shared.InterestModel Intrests { get; set; } = new();
+    public InterestModel Intrest { get; set; } = new();
 
     private string SearchTerm { get; set; } = string.Empty;
 
-    public List<string> ThreadsList = new();
+    public List<ThreadModel> ThreadsList = new();
+
+    string tokenFromLocalStorage = "Före token";
+
+    public ThreadModel Thread { get; set; } = new();
 
     public List<string> SearchList = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ThreadsList.Add(Intrests.Name);
-        ThreadsList.Add("Best souls like game");
-        ThreadsList.Add("Who is your daddy? And why is it me?");
-        ThreadsList.Add("Worst souls like game");
-        ThreadsList.Add("a");
-        ThreadsList.Add("z");
-        ThreadsList.Sort();
+        //    return base.OnInitializedAsync();
+
+        ThreadsList = await ThreadManager.GetThreads();
+        //ThreadsList.Sort();
     }
 
-    public async Task OnSearch()
+
+
+
+        public async Task CreateNewThread()
     {
-        //todo: adda msgs till varje thread
-        //fixa med bannade/bortagna users
+        // Get token
+        tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
-        SearchList = ThreadsList.Where(s => s.Contains(SearchTerm)).ToList();
-        StateHasChanged();
+        // Skickar token tillsammans med Interest objekt
+        await ThreadManager.CreateNewThread(Thread, tokenFromLocalStorage);
+
+        ThreadsList = await ThreadManager.GetThreads();
+        //ThreadsList.Sort();
+
+
+
     }
+
 
 }
