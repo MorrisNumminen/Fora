@@ -5,36 +5,72 @@
 @using Fora.Shared
 @page "/mypage"
 
-<h3>MyPage</h3>
 
 
-@if(loginStatus.IsLoggedIn)
+<h1>My Page/User Settings</h1>
+
+@if(loginStatus != null && loginStatus.IsLoggedIn)
 {
-    <h1>You only see this because you're logged in</h1>
-
-    @if(loginStatus.IsAdmin)
-    {
-        <h1>You only see this because you're an admin</h1>
-    }
+    <h1>You're logged in</h1>
 }
+
+<EditForm Model=@User OnSubmit="ChangePassword">
+    <label>Current password:</label>
+    <InputText @bind-Value="User.Password"></InputText>
+        <label>New password:</label>
+    <InputText @bind-Value="newPassword" />
+    <label>Confirme Password:</label>
+    <InputText @bind-Value="confirmPassword" />
+    <input type="submit" value="Change password" />
+</EditForm>
+
+<div>
+    <button @onclick="DeleteUser">Delete user</button>
+</div>
 
 
 @code {
+    // 1. Byta Lösenord
+    // 2. Flagga sin användare som borttagen
+    // 3. Radera användare
+    public UserDto User { get; set; } = new();
+
     private LoginDto? loginStatus;
+    private string? token;
+    private string? newPassword;
+    private string? confirmPassword;
+
+    public void DeleteUser()
+    {
+         UserManager.DeleteUser(token);
+    }
+
+    public async Task ChangePassword()
+    {
+        // Run change password method in UserManager
+
+        string token = await LocalStorage.GetItemAsStringAsync("token");
+
+        if(newPassword == confirmPassword && token != null)
+        {
+            await UserManager.ChangePasswordUser(User, newPassword, token);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Hämta token från Local Storage
-        // 2. Skicka token till API för att kolla om vi är inloggade
-        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+        
         // 4. Rendera endast delar av sidan beroende på om vi är inloggade eller inte (boolen)
 
-        // 1
+        // 1. Hämta token från Local Storage
 
-        var token = await LocalStorage.GetItemAsStringAsync("token");
+        token = await LocalStorage.GetItemAsStringAsync("token");
 
-        // 2 
+        // 2. Skicka token till API för att kolla om vi är inloggade
 
         loginStatus = await UserManager.CheckUserLogin(token);
+        
+        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+      
     }
 }

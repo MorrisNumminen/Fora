@@ -7,5 +7,7 @@ namespace Fora.Client.Services
         Task<string> RegisterUser(UserDto user);
         Task<string> LogInUser(UserDto userToLogin);
         Task<LoginDto> CheckUserLogin(string token);
+        Task ChangePasswordUser(UserDto user, string newPassword, string token);
+        Task DeleteUser(string token);
     }
 }

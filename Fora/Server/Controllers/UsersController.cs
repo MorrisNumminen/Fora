@@ -11,10 +11,14 @@ namespace Fora.Server.Controllers
     {
 
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AppDbContext _context;
+        private readonly AuthDbContext _authContext;
 
-        public UsersController(SignInManager<ApplicationUser> signInManager)
+        public UsersController(SignInManager<ApplicationUser> signInManager, AppDbContext context, AuthDbContext authContext)
         {
             _signInManager = signInManager;
+            _context = context;
+            _authContext = authContext;
         }
 
         // GET: api/<UsersController>
@@ -43,6 +47,12 @@ namespace Fora.Server.Controllers
             // Check createUserResult
             if (createUserResult.Succeeded)
             {
+                _context.Users.Add(new UserModel()
+                {
+                    Username = userToRegister.Username,
+                });
+                await _context.SaveChangesAsync();
+
                 string token = Guid.NewGuid().ToString();
 
                 // Add the new token to the user in the identity db
@@ -74,38 +84,39 @@ namespace Fora.Server.Controllers
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
                 //await _signInManager.UserManager.UpdateAsync(user);
-   
+
                 return Ok(user.Token);
-            }            
+            }
 
             return BadRequest("Could not login");
         }
 
-        [HttpGet]
-        [Route("check")]
-        public async Task<LoginDto> CheckUserLogin([FromQuery] string token)
+        [HttpGet("check/{token}")]
+        public async Task<ActionResult<LoginDto>> CheckUserLogin([FromRoute] string token)
         {
             // See what user has the specified token (in the db)
 
-            LoginDto loginStatus = new();
+
 
             var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
 
-            if(userWithToken != null)
+            if (userWithToken != null)
             {
+                LoginDto loginStatus = new();
                 loginStatus.IsLoggedIn = true;
 
                 // Is user admin?
 
-                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "Admin");
+                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "admin");
 
-                if(roleCheckResult)
+                if (roleCheckResult)
                 {
                     loginStatus.IsAdmin = true;
                 }
+                return Ok(loginStatus);
             }
 
-            return loginStatus;
+            return BadRequest("User not found");
         }
 
         // PUT api/<UsersController>/5
@@ -118,9 +129,45 @@ namespace Fora.Server.Controllers
         }
 
         // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("delete/{token}")]
+        public async Task<ActionResult> DeleteUser(string token)
         {
+            var userWithToken =  _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            var user = _context.Users.FirstOrDefault(u => u.Username == userWithToken.UserName);
+            
+
+            if (userWithToken != null)
+            {
+                var deleteResult = await _signInManager.UserManager.DeleteAsync(userWithToken);
+                
+                if(deleteResult.Succeeded)
+                {
+                    _context.Users.Remove(user);
+                    await _context.SaveChangesAsync();
+
+                    return Ok();
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("change")]
+        public async Task<IActionResult> ChangeUserPassword([FromBody] UserDto user, [FromQuery] string newPassword, [FromQuery] string token)
+        {
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+
+            if (userWithToken != null)
+            {
+                var changePasswordResult = await _signInManager.UserManager.ChangePasswordAsync(userWithToken, user.Password, newPassword);
+
+                if (changePasswordResult.Succeeded)
+                {
+                    return Ok();
+                }
+            }
+
+            return BadRequest();
         }
     }
 }
