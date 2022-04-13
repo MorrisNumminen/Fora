@@ -32,6 +32,7 @@ namespace Fora.Client.Services
 
             var token = await response.Content.ReadAsStringAsync();
 
+            _navigationManager.NavigateTo("Login");
             return token;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Fora.Server.Controllers
@@ -13,12 +14,14 @@ namespace Fora.Server.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly AppDbContext _context;
         private readonly AuthDbContext _authContext;
+  
 
         public UsersController(SignInManager<ApplicationUser> signInManager, AppDbContext context, AuthDbContext authContext)
         {
             _signInManager = signInManager;
             _context = context;
             _authContext = authContext;
+           
         }
 
         // GET: api/<UsersController>
@@ -61,6 +64,7 @@ namespace Fora.Server.Controllers
 
                 await _signInManager.UserManager.UpdateAsync(newUser);
 
+                
                 return Ok(token);
 
             }
