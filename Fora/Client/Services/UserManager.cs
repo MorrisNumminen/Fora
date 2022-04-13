@@ -1,15 +1,27 @@
 ﻿using Fora.Shared;
+using Newtonsoft.Json;
 using System.Net.Http.Json;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 
 namespace Fora.Client.Services
 {
     public class UserManager : IUserManager
     {
         private readonly HttpClient _http;
+        private readonly ILocalStorageService _localStorage;
+        private readonly NavigationManager _navigationManager;
 
-        public UserManager(HttpClient http)
+        public UserManager(HttpClient http, ILocalStorageService localStorage, NavigationManager navigationManager )
         {
             _http = http;
+            _localStorage = localStorage;
+            _navigationManager = navigationManager;
+        }
+
+        public async Task DeleteUser(string token)
+        {
+            var deleteResponse = await _http.DeleteAsync($"api/users/delete/{token}");
         }
 
         public async Task<string> RegisterUser(UserDto userToRegister)
@@ -32,24 +44,41 @@ namespace Fora.Client.Services
 
             return token;
         }
-
+         
         public async Task<LoginDto> CheckUserLogin(string token)
         {
+            token = token.Replace("\"", "");
+
             // Use token to check user status (logged in, admin, banned, deleted...)
 
-            var response = await _http.GetFromJsonAsync<LoginDto>($"api/users/check?accessToken={token}");
+           
+            var loginResponse = await _http.GetAsync($"api/users/check/{token}");
 
-            return response;
+
+            if (loginResponse.IsSuccessStatusCode)
+            {
+                var result = await loginResponse.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<LoginDto>(result);
+
+                return data;
+            }
+
+            return null;
         }
 
-        //public async Task<string> CreateInterest(InterestModel interestToAdd)
-        //{
-        //    //skapa interest
-        //    var response = await _http.PostAsJsonAsync<InterestModel>("api/users/createInterest", interestToAdd);
+        public async Task LogOutUser()
+        {
+            
+            await _localStorage.RemoveItemAsync("token");
+            _navigationManager.NavigateTo("/");
 
-        //    string interestId = await response.Content.ReadAsStringAsync();
+        }
 
-        //    return interestId;
-        //}
+        public async Task ChangePasswordUser(UserDto user, string newPassword, string token)
+        {
+
+            var changePasswordResponse = await _http.PostAsJsonAsync($"api/users/change?newPassword={newPassword}&token={token}", user);
+        }
+
     }
 }
