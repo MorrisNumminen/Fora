@@ -3,7 +3,11 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-
+#backgroundsize {
+   
+    background-repeat: no-repeat;
+    background-size: auto;
+}
 h1:focus {
     outline: none;
 }

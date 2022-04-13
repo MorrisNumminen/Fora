@@ -19,10 +19,7 @@ namespace Fora.Client.Services
             _navigationManager = navigationManager;
         }
 
-        public async Task DeleteUser(string token)
-        {
-            var deleteResponse = await _http.DeleteAsync($"api/users/delete/{token}");
-        }
+       
 
         public async Task<string> RegisterUser(UserDto userToRegister)
         {
@@ -48,7 +45,7 @@ namespace Fora.Client.Services
          
         public async Task<LoginDto> CheckUserLogin(string token)
         {
-            token = token.Replace("\"", "");
+         
 
             // Use token to check user status (logged in, admin, banned, deleted...)
 
@@ -67,13 +64,16 @@ namespace Fora.Client.Services
             return null;
         }
 
-        public async Task LogOutUser()
-        {
-            
+        public async Task LogOutUser(string token)
+        {  
             await _localStorage.RemoveItemAsync("token");
-            _navigationManager.NavigateTo("/");
-
         }
+
+        public async Task DeleteUser(string token)
+        {
+            var deleteResponse = await _http.DeleteAsync($"api/users/delete/{token}");
+        }
+
 
         public async Task ChangePasswordUser(UserDto user, string newPassword, string token)
         {

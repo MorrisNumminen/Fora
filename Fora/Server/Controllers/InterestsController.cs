@@ -47,15 +47,27 @@ namespace Fora.Server.Controllers
                 return Ok();
             }
 
-
-
-
-
-
-
             return BadRequest("Could not create a user");
 
         }
 
+        // POST api/<UsersController>
+        [HttpPost("addinterest")]
+        public async Task AddUserInterest([FromBody] InterestModel interest, [FromQuery] string token)
+        {
+            var interestToAdd = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
+            var authUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            var user = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
+
+            if (interestToAdd != null && user != null)
+            {
+                _dbContext.UserInterests.Add(new UserInterestModel()
+                {
+                    User = user,
+                    Interest = interestToAdd,
+                });
+                await _dbContext.SaveChangesAsync();
+            }
+        }
     }
 }

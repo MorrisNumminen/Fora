@@ -1,4 +1,13 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using System;
+@using System.Collections.Generic;
+@using Fora.Client.Services
+@using Fora.Shared;
+@using Blazored.LocalStorage
+@inject IUserManager UserManager;
+@inject IInterestManager InterestManager;
+@inject ILocalStorageService LocalStorage;
+@inject NavigationManager NavigationManager;
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Fora</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -7,7 +16,9 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+
+{
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -21,7 +32,7 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="login">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Login
+                <span class="oi oi-account-login" aria-hidden="true"></span> Login
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -29,26 +40,54 @@
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Intrests
             </NavLink>
         </div>
+
+        @if(loginStatus != null && loginStatus.IsLoggedIn){
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="threads">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Threads
+            <NavLink class="nav-link" href="usersettings">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> User Settings
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="thread">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Thread
+            <NavLink class="nav-link" @onclick="LogOutUser">
+                <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
             </NavLink>
         </div>
+        
+        }    
     </nav>
 </div>
+
+
+    
+
+
 
 @code {
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    private LoginDto? loginStatus;
+    private string? token;
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task LogOutUser()
+    {
+        await UserManager.LogOutUser(token);
+        var message = "Logged out";
+        NavigationManager.NavigateTo($"LogoutLanding/{message}", true);
+    }
+
+    //Visa User Settings i NavBar ifall en användare är inloggad
+    protected override async Task OnInitializedAsync()
+    {
+        token = await LocalStorage.GetItemAsStringAsync("token");
+
+        loginStatus = await UserManager.CheckUserLogin(token);
+        StateHasChanged();
     }
 }

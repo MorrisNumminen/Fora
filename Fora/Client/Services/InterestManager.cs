@@ -25,5 +25,10 @@ namespace Fora.Client.Services
             return null;
         }
 
+        public async Task AddUserInterest(InterestModel interestToAdd, string token)
+        {
+            var response = await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/addinterest?token={token}", interestToAdd);
+        }
+
     }
 }

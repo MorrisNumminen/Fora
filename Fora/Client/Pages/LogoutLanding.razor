@@ -1,0 +1,11 @@
+﻿@page "/LogoutLanding/{Message}"
+
+@if(Message != null)
+{
+    <h3>User Was @Message</h3>
+}
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+}

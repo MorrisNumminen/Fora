@@ -109,13 +109,17 @@ namespace Fora.Server.Controllers
                 LoginDto loginStatus = new();
                 loginStatus.IsLoggedIn = true;
 
-                // Is user admin?
+                // Is user Deleted?
 
-                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "admin");
+                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "deleted");
 
                 if (roleCheckResult)
                 {
-                    loginStatus.IsAdmin = true;
+                    loginStatus.IsDeleted = true;
+                }
+                else if (roleCheckResult)
+                {
+                    loginStatus.IsBanned = true;
                 }
                 return Ok(loginStatus);
             }
@@ -148,6 +152,7 @@ namespace Fora.Server.Controllers
                 {
                     _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
+                    
 
                     return Ok();
                 }
