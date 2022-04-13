@@ -8,7 +8,11 @@
 @inject ILocalStorageService LocalStorage;
 @page "/usersettings"
 
-<h3>User Settings</h3>
+
+@if(loginStatus != null && loginStatus.IsLoggedIn)
+{
+    <h3>You're logged in</h3>
+
 
 <h5>Interests</h5>
 <h3>@loadingMessage</h3>
@@ -23,6 +27,30 @@
     <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
     <button type="submit">Create</button>
 </EditForm>
+
+
+
+<h3>Change Password, Delete User and Flag User</h3>
+
+<EditForm Model=@User OnSubmit="ChangePassword">
+    <div class="col-3">
+    <label>Current password:</label>
+    <InputText @bind-Value="User.Password"></InputText>
+    <br />
+        <label>New password:</label>
+    <InputText @bind-Value="newPassword" />
+    <br />
+    <label>Confirme Password:</label>
+    <InputText @bind-Value="confirmPassword" />
+    <input type="submit" value="Change password" />
+    </div>
+</EditForm>
+
+<div>
+    <button @onclick="DeleteUser">Delete user</button>
+</div>
+
+}
 
 
 
@@ -54,24 +82,63 @@
 
     public InterestModel Interest { get; set; } = new();
 
-    string loadingMessage;
+    string? loadingMessage;
 
     string tokenFromLocalStorage = "Före token";
+
+    public UserDto User { get; set; } = new();
+
+    private LoginDto? loginStatus;
+    private string? token;
+    private string? newPassword;
+    private string? confirmPassword;
 
     protected override async Task OnInitializedAsync()
     {
         loadingMessage = "Loading interests...";
         interests = await InterestManager.GetInterests();
         loadingMessage = "Finished loading!";
+
+
+        token = await LocalStorage.GetItemAsStringAsync("token");
+
+        // 2. Skicka token till API för att kolla om vi är inloggade
+
+        loginStatus = await UserManager.CheckUserLogin(token);
+
+        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+
     }
 
-    public async void CreateNewInterest()
+    public async Task CreateNewInterest()
     {
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Interest objekt
-        InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
+        await InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
+
+        interests = await InterestManager.GetInterests();
+
     }
 
+
+    public void DeleteUser()
+    {
+         UserManager.DeleteUser(token);
+    }
+
+    public async Task ChangePassword()
+    {
+        // Run change password method in UserManager
+
+        string token = await LocalStorage.GetItemAsStringAsync("token");
+
+        if(newPassword == confirmPassword && token != null)
+        {
+            await UserManager.ChangePasswordUser(User, newPassword, token);
+        }
+    }
+
+   
 }
