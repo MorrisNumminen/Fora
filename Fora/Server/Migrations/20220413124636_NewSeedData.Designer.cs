@@ -4,6 +4,7 @@ using Fora.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fora.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220413124636_NewSeedData")]
+    partial class NewSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,48 +140,6 @@ namespace Fora.Server.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Threads");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Introduce yourself!"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "DS3 Cheat codes plz"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "How to get rich in sims 66"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Why is my game lagging???"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "How to git gud"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "New Lego City Speedrun Record!"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "GTA hydra abuse"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Tetris laggy. What is my bottleneck??? help"
-                        });
                 });
 
             modelBuilder.Entity("Fora.Shared.UserInterestModel", b =>
@@ -194,7 +154,7 @@ namespace Fora.Server.Migrations
 
                     b.HasIndex("InterestId");
 
-                    b.ToTable("UserInterests");
+                    b.ToTable("UserInterestModel");
                 });
 
             modelBuilder.Entity("Fora.Shared.UserModel", b =>
