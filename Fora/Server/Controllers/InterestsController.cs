@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Fora.Client.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace Fora.Server.Controllers
 {
@@ -9,33 +10,52 @@ namespace Fora.Server.Controllers
     public class InterestsController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public InterestsController(AppDbContext dbContext)
+        public InterestsController(AppDbContext dbContext, SignInManager<ApplicationUser> signInManager)
         {
             _dbContext = dbContext;
+            _signInManager = signInManager;
         }
 
         // GET api/<UsersController>
         [HttpGet("getinterests")]
-        public async Task<List<InterestModel>> GetInterest()
+        public async Task<List<InterestModel>> GetInterests()
         {
-
-           //var listOfInterests = _dbContext.Interests.ToList();
-
+            // Returnera lista med interests
             return _dbContext.Interests.ToList();
         }
 
 
         // POST api/<UsersController>
-        //[HttpPost("addinterest")]
-        //public async Task<ActionResult<string>> CreateInterest([FromBody] InterestModel interestToAdd)
-        //{
+        [HttpPost("createinterest")]
+        public async Task<ActionResult<string>> CreateNewInterest([FromBody] InterestModel interestToCreate, [FromQuery] string token)
+        {
+            InterestModel newInterest = new();
+            newInterest.Name = interestToCreate.Name;
 
-        //    _dbContext.Interests.Add(new InterestModel { Id = 1, Name = "Tv-spel", Threads = null, UserInterests = null, UserId = 999, User = null });
-        //    _dbContext.SaveChanges();
+            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
 
-        //    return BadRequest("Could not create a user");
-        //}
+            if (identityUser != null)
+            {
+                var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+                interestToCreate.User = user;
+
+                _dbContext.Interests.Add(interestToCreate);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok();
+            }
+
+
+
+
+
+
+
+            return BadRequest("Could not create a user");
+
+        }
 
     }
 }

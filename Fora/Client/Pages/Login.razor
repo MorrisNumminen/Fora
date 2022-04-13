@@ -3,6 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Fora.Client.Services
 @using Fora.Shared
+@inject NavigationManager NavigationManager;
 @inject IUserManager UserManager
 @inject ILocalStorageService LocalStorage
 @page "/login"
@@ -17,24 +18,24 @@ body {
 
 <h3>Login</h3>
 
-<EditForm Model="@User" On>
+<EditForm Model="@User" OnSubmit="LogInUser">
     <InputText @bind-Value="@User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="@User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Log In</button>
 </EditForm>
 
 @code {
-
     public UserDto User { get; set; } = new();
-
-
 
     private async Task LogInUser()
     {
+        Console.WriteLine("click");
         var token = await UserManager.LogInUser(User);
+        //var username = await UserManager.LogInUser(User);
 
         // Add the token to the local storage
         await LocalStorage.SetItemAsStringAsync("token", token);
+        // await LocalStorage.SetItemAsStringAsync("username", username);
 
         // Get token from LS
 
@@ -42,13 +43,16 @@ body {
 
         if(tokenFromLocalStorage == null)
         {
-            
+            NavigationManager.NavigateTo("registeruser");
         }
         else 
         {
             // Get stuff from api with the token as key
+            NavigationManager.NavigateTo("MyPage");
         }
     }
+
+   
 
 
 }
