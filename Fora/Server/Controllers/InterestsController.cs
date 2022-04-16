@@ -26,6 +26,45 @@ namespace Fora.Server.Controllers
             return _dbContext.Interests.ToList();
         }
 
+        [HttpPost("AddUserInterest")]
+        public async Task<ActionResult<List<InterestModel>>> AddUserInterest([FromQuery] string token, [FromBody] InterestModel interest)
+        {
+            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+            var dbInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
+
+            if (dbUser != null && dbInterest != null)
+            {
+                UserInterestModel userInterest = new UserInterestModel()
+                {
+                    User = dbUser,
+                    Interest = dbInterest
+                };
+
+                _dbContext.UserInterests.Add(userInterest);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet("UserInterests")]
+        public async Task<ActionResult<List<InterestModel>>> GetUserInterests([FromQuery] string token)
+        {
+            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+
+            if(user != null)
+            {
+                var userInterests = _dbContext.Interests.Where(i => i.UserInterests.Any(ui => ui.UserId == user.Id)).ToList();
+
+                return Ok(userInterests);
+            }
+
+            return BadRequest();
+        }
 
         // POST api/<UsersController>
         [HttpPost("createinterest")]
@@ -55,17 +94,18 @@ namespace Fora.Server.Controllers
         [HttpPost("addinterest")]
         public async Task AddUserInterest([FromBody] InterestModel interest, [FromQuery] string token)
         {
-            var interestToAdd = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
+            var dbInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
             var authUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
-            var user = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
+            var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
 
-            if (interestToAdd != null && user != null)
+            if (dbInterest != null && dbUser != null)
             {
                 _dbContext.UserInterests.Add(new UserInterestModel()
                 {
-                    User = user,
-                    Interest = interestToAdd,
+                    User = dbUser,
+                    Interest = dbInterest,
                 });
+
                 await _dbContext.SaveChangesAsync();
             }
         }
