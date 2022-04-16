@@ -25,5 +25,23 @@ namespace Fora.Client.Services
             return null;
 
         }
+
+        public async Task<List<MessageModel>> GetThreadMessages()
+        {
+            return await _httpClient.GetFromJsonAsync<List<MessageModel>>("api/Threads/getthreadmessages");
+        }
+
+        public async Task<string> CreateNewMessage(MessageModel messageToCreate, string token)
+        {
+            // Lägg till ett message i db
+
+            var response = await _httpClient.PostAsJsonAsync<MessageModel>($"api/Threads/createmessage?token={token}", messageToCreate);
+
+            return null;
+
+        }
+
+
+
     }
 }

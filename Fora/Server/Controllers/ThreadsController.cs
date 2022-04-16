@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Fora.Client.Services;
+using System.Linq;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fora.Server.Controllers
 {
@@ -17,6 +19,7 @@ namespace Fora.Server.Controllers
             _dbContext = dbContext;
             _signInManager = signInManager;
         }
+
 
         //GET api/<UsersController>
         [HttpGet("getthreads")]
@@ -49,6 +52,56 @@ namespace Fora.Server.Controllers
 
             return BadRequest("Could not create thread");
         }
+
+
+
+        //GET messages related to thread
+        [HttpGet("getthreadmessages")]
+        public async Task<List<MessageModel>> GetThreadMessages()
+        {
+            // Returnera lista med threads
+            //return _dbContext.Messages.ToList();
+
+            int id = 1;
+
+        var messages = _dbContext.Messages.Include(m => m.User).Where(m => m.ThreadId == id).Select(m => new MessageModel
+            {
+                
+                Message = m.Message,
+                User = new UserModel()
+                {
+                    Id = m.User.Id,
+                    Username = m.User.Username,
+                    Banned = m.User.Banned,
+                    Deleted = m.User.Deleted,
+                }
+            }).ToList();
+
+            return messages;
+        }
+
+        //POST a new message
+        [HttpPost("createmessage")]
+        public async Task<ActionResult<string>> CreateMessage([FromBody] MessageModel messageToCreate, [FromQuery] string token)
+        {
+            MessageModel newMessage = new();
+
+            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+
+            if (identityUser != null)
+            {
+                var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+                messageToCreate.User = user;
+
+                _dbContext.Messages.Add(messageToCreate);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok();
+            }
+
+            return BadRequest("Could not create message");
+        }
+
 
     }
 }
