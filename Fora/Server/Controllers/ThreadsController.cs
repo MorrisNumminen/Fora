@@ -56,18 +56,18 @@ namespace Fora.Server.Controllers
 
 
         //GET messages related to thread
-        [HttpGet("getthreadmessages")]
-        public async Task<List<MessageModel>> GetThreadMessages()
+        [HttpGet("getthreadmessages/{threadId}")]
+        public async Task<List<MessageModel>> GetThreadMessages(int threadId)
         {
             // Returnera lista med threads
             //return _dbContext.Messages.ToList();
+            int CurrentThreadId = threadId;
+            Console.WriteLine(CurrentThreadId);
 
-            int id = 1;
-
-        var messages = _dbContext.Messages.Include(m => m.User).Where(m => m.ThreadId == id).Select(m => new MessageModel
+        var messages = _dbContext.Messages.Include(m => m.User).Where(m => m.ThreadId == CurrentThreadId).Select(m => new MessageModel
             {
-                
-                Message = m.Message,
+
+            Message = m.Message,
                 User = new UserModel()
                 {
                     Id = m.User.Id,

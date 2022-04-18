@@ -26,9 +26,9 @@ namespace Fora.Client.Services
 
         }
 
-        public async Task<List<MessageModel>> GetThreadMessages()
+        public async Task<List<MessageModel>> GetThreadMessages(int threadId)
         {
-            return await _httpClient.GetFromJsonAsync<List<MessageModel>>("api/Threads/getthreadmessages");
+            return await _httpClient.GetFromJsonAsync<List<MessageModel>>($"api/Threads/getthreadmessages/{threadId}");
         }
 
         public async Task<string> CreateNewMessage(MessageModel messageToCreate, string token)

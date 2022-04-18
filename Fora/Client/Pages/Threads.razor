@@ -40,7 +40,9 @@ body {
 
 @foreach(var thread in ThreadsList)
     {
-        <a class="btn-outline-light" href="thread">@thread.Name</a>
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        //<a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+
         <br/>
     }
 

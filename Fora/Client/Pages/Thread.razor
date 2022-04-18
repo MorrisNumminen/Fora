@@ -2,7 +2,8 @@
 @using Blazored.LocalStorage;
 @inject IThreadManager ThreadManager;
 @inject ILocalStorageService LocalStorage;
-@page "/thread"
+@page "/thread/{ThreadId:int}"
+
 
 <PageTitle>Thread Name goes here</PageTitle>
 <style>
@@ -16,7 +17,7 @@ body {
 
 @foreach( var msg in Messages)
 {
-    @msg;
+    @msg.Message;
     <br/>
 }
 
@@ -29,11 +30,18 @@ body {
 
 
 @code {
+
+    [Parameter]
+    public int ThreadId { get; set; }
+
     public ThreadModel CurrentThread = new();
 
     public MessageModel NewMessage { get; set; } = new();
 
-    public List<MessageModel> Messages { get; set; } = new();
+    //public MsgDto NewMessage { get; set; } = new();
+
+    public List<MessageModel> Messages = new();
+
 
 
     string tokenFromLocalStorage = "Före token";
@@ -41,7 +49,11 @@ body {
 
     protected override async Task OnInitializedAsync()
     {
-        Messages = await ThreadManager.GetThreadMessages();
+
+        Console.WriteLine(ThreadId);
+
+        Messages = await ThreadManager.GetThreadMessages(ThreadId);
+
     }
 
 
@@ -51,9 +63,12 @@ body {
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Message objekt
+
+        NewMessage.ThreadId = ThreadId;
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
 
-        StateHasChanged();
+
+        //StateHasChanged();
 
     }
 
