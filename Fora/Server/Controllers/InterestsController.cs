@@ -109,24 +109,5 @@ namespace Fora.Server.Controllers
                 await _dbContext.SaveChangesAsync();
             }
         }
-        [HttpPost("removeuserinterest")]
-        public async Task RemoveUserInterest([FromBody] InterestModel interest, [FromQuery] string token)
-        {
-
-            var dbInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
-            var authUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
-            var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
-
-            if (dbInterest != null && dbUser != null)
-            {
-                _dbContext.UserInterests.Remove(new UserInterestModel()
-                {
-                    User = dbUser,
-                    Interest = dbInterest,
-                });
-
-                await _dbContext.SaveChangesAsync();
-            }
-        }
     }
 }

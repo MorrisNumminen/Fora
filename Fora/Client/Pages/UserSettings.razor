@@ -38,13 +38,10 @@
 @*Favorite Lista*@
 
     <div class="col-3">
-        <h4>Favorite Interests</h4>
         <ul>
             @foreach(var favo in userInterests)
             {
                 <li>@favo.Name</li>
-                <li><em>@favo.Name </em><button onclick="@(() => RemoveUserInterest(favo.Id))" 
-                class="btn btn-outline-danger"> Remove </button></li>
             }
         </ul>
 
@@ -146,19 +143,6 @@
         }
     }
 
-    public async Task RemoveUserInterest(int id)
-    {
-        
-         var ui = interests.FirstOrDefault(ui => ui.Id == id);
-
-        if(ui != null)
-        {
-            await InterestManager.RemoveUserInterests(ui, token);
-            userInterests = await InterestManager.GetUserInterests(token);
-            StateHasChanged();
-        }
-    }
-
     public async Task CreateNewInterest()
     {
         // Get token
@@ -182,8 +166,9 @@
 
     public void BanUser()
     {
-        UserManager.BanUser(token);        
-        string action = "Banned";
+        UserManager.BanUser(token);
+        UserManager.LogOutUser(token);
+        string action = "Banned. Login to reverse the ban";
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
 
 
