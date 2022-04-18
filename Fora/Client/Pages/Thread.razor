@@ -1,6 +1,7 @@
 ﻿@using Fora.Shared
 @using Blazored.LocalStorage;
 @inject IThreadManager ThreadManager;
+@inject IUserManager UserManager;
 @inject ILocalStorageService LocalStorage;
 @page "/thread/{ThreadId:int}"
 
@@ -13,11 +14,19 @@ body {
 </style>
 
 
-<h3>Thread</h3>
+<h3>@CurrentThread.Name</h3>
 
-@foreach( var msg in Messages)
+@foreach( var MessageObj in Messages)
 {
-    @msg.Message;
+
+    <div class="card">
+        <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
+        <h4><b>Username goes here</b></h4>
+        <div class="container">
+            <p>@MessageObj.Message</p>
+        </div>
+    </div>
+
     <br/>
 }
 
@@ -33,6 +42,7 @@ body {
 
     [Parameter]
     public int ThreadId { get; set; }
+    public UserModel CurrentUser { get; set; }
 
     public ThreadModel CurrentThread = new();
 
