@@ -74,6 +74,15 @@ namespace Fora.Client.Services
             var deleteResponse = await _http.DeleteAsync($"api/users/delete/{token}");
         }
 
+        public async Task BanUser(string token)
+        {
+            var banResponse = await _http.GetAsync($"api/users/ban/{token}");
+        }
+
+        public async Task UnbanUser(string token)
+        {
+            var unbanResponse = await _http.GetAsync($"api/users/unban/{token}");
+        }
 
         public async Task ChangePasswordUser(UserDto user, string newPassword, string token)
         {

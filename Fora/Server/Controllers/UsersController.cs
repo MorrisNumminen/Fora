@@ -87,7 +87,7 @@ namespace Fora.Server.Controllers
 
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
-                //await _signInManager.UserManager.UpdateAsync(user);
+                
 
                 return Ok(user.Token);
             }
@@ -121,6 +121,7 @@ namespace Fora.Server.Controllers
                 {
                     loginStatus.IsBanned = true;
                 }
+
                 return Ok(loginStatus);
             }
 
@@ -134,6 +135,50 @@ namespace Fora.Server.Controllers
 
 
 
+        }
+
+        [HttpGet("ban/{token}")]
+        public async Task<ActionResult> BanUser(string token)
+        {
+
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            if(userWithToken != null)
+            {
+                LoginDto loginStatus = new();
+                loginStatus.IsBanned = true;
+
+                var banResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "Banned");
+                if (banResult)
+                {                                    
+                    return Ok();
+                }
+
+                
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet("unban/{token}")]
+        public async Task<ActionResult> UnbanUser(string token)
+        {
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            if (userWithToken != null)
+            {
+                LoginDto loginStatus = new();
+                loginStatus.IsBanned = false;
+
+                var banResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "Banned");
+                if (banResult == false)
+                {
+                    loginStatus.IsLoggedIn = true;
+                    return Ok();
+                }
+
+
+            }
+
+            return BadRequest();
         }
 
         // DELETE api/<UsersController>/5

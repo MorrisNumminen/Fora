@@ -79,7 +79,14 @@
  
 <div class="col-4"></div>
 <div class="col-2">
-    <button class="btn-outline-danger" @onclick="DeleteUser">Delete user</button>
+    @*Delete User *@
+    <button class="btn-outline-danger" @onclick="DeleteUser">Delete User</button>
+    <br />    
+    @*Ban User *@
+    <button class="btn-outline-warning" @onclick="BanUser">Ban User</button>
+    <br />
+    @*Unban User*@
+    <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
 </div>
    
 </div>   
@@ -157,7 +164,21 @@
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
     }
 
-    
+    public void BanUser()
+    {
+        UserManager.BanUser(token);
+        UserManager.LogOutUser(token);
+        string action = "Banned. Login to reverse the ban";
+        NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
+
+
+    }
+    public void UnbanUser()
+    {
+        UserManager.UnbanUser(token);
+        NavigationManager.NavigateTo("usersettings");
+    }
+
 
     
 
