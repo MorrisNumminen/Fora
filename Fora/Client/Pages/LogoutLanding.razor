@@ -10,7 +10,15 @@
     <h3>User Was @Message</h3>
 }
 
-<button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
+
+
+
+@if(loginStatus != null && loginStatus.IsBanned)
+{
+    <h3>Click the button below to get unbanned or go to User Settings and Unban there</h3>
+    <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
+    
+}
 
 
 @code {
@@ -23,8 +31,12 @@
     protected override async Task OnInitializedAsync()
     {
         token = await LocalStorage.GetItemAsStringAsync("token");
-                
+
+        loginStatus = await UserManager.CheckUserLogin(token);
+
+
     }
+
 
 
      public void UnbanUser()

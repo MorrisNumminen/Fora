@@ -27,11 +27,11 @@ namespace Fora.Client.Services
 
         public async Task AddUserInterests(InterestModel interest, string token)
         {
-            var response = await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/AddUserInterest?token={token}", interest);
+             await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/AddUserInterest?token={token}", interest);
         }
         public async Task RemoveUserInterests(InterestModel removeInterest, string token)
         {
-            var response = await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/RemoveUserInterest?token={token}", removeInterest);
+             await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/RemoveUserInterest?token={token}", removeInterest);
 
         }
 

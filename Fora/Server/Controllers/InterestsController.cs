@@ -76,12 +76,13 @@ namespace Fora.Server.Controllers
             newInterest.Name = interestToCreate.Name;
 
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
-            var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+            
 
             if (identityUser != null)
             {
-                
-                 interestToCreate.User = user;
+                var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+
+                // interestToCreate.User = user;
 
                 _dbContext.Interests.Add(interestToCreate);
                 await _dbContext.SaveChangesAsync();
@@ -89,7 +90,7 @@ namespace Fora.Server.Controllers
                 return Ok();
             }
 
-            return BadRequest("Could not create a user");
+            return BadRequest("Could not create a interest");
 
         }
 

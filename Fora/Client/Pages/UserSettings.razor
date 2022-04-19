@@ -12,7 +12,7 @@
 
 @if(loginStatus != null && loginStatus.IsLoggedIn)
 {
-    <h3 class="text-center">You're logged in</h3>
+    <h3 class="text-center">You're logged in as @User.Username</h3>
 
 
 
@@ -89,12 +89,17 @@
     <button class="btn-outline-warning" @onclick="BanUser">Ban User</button>
     <br />
     @*Unban User*@
-    <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
+    
 </div>
    
 </div>   
 }
 
+@if(loginStatus != null && loginStatus.IsBanned)
+{
+    <h3>This user has been flagged as Banned</h3>
+    <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
+}
 
 
 
@@ -126,15 +131,17 @@
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
-        userInterests = await InterestManager.GetUserInterests(token); //This one
-        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+
+         //This one
+        userInterests = await InterestManager.GetUserInterests(token);                                                                
 
         loadingMessage = "Loading interests...";
         interests = await InterestManager.GetInterests();
-        
+
         loadingMessage = "Finished loading!";
     }
-   
+
+    
 
     private async Task AddInterest(int id)
     {
@@ -182,18 +189,18 @@
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
     }
 
-    public void BanUser()
+    public async Task BanUser()
     {
-        UserManager.BanUser(token);        
+        await UserManager.BanUser(token);        
         string action = "Banned";
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
 
 
     }
-    public void UnbanUser()
+    public async Task UnbanUser()
     {
-        UserManager.UnbanUser(token);
-        NavigationManager.NavigateTo("usersettings");
+        await UserManager.UnbanUser(token);
+        NavigationManager.NavigateTo("usersettings", true);
     }
 
 
@@ -216,22 +223,3 @@
 
 
 
-@*
-● Se intressen man har på sin användare
-● Se alla intressen som finns på appen
-● Skapa nya intressen
-● Lägga till redan existerande intressen till sin användare
-● Ta bort intressen från sin användare
-● Ta bort intressen man själv skapat från appen
-● Byta lösenord
-● Se, ändra och ta bort profilbild
-● Ta bort intressen om man är admin
-● Se om man är admin
-● Tilldela adminrättigheter till andra användare om man är admin
-● Ta bort adminrättigheter från andra användare om man är admin
-● Banna andra användare om man är admin
-● Avbanna andra användare om man är admin
-● Möjligheten bestämma målspråk för översättning (se avsnittet “Bedömning - Niceto-have” nedan)
-● Se trådar man skapat
-● Flagga sin användare som borttagen
-● Ta bort sitt användare*@
