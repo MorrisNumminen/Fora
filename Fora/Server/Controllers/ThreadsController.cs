@@ -102,6 +102,33 @@ namespace Fora.Server.Controllers
             return BadRequest("Could not create message");
         }
 
+        //POST a new message
+        [HttpPost("deletemessage")]
+        public async Task<ActionResult<string>> DeleteMessage([FromBody] int messageDelId, [FromQuery] string token)
+        {
+            Console.WriteLine("DeleteMessage() : Controller");
+
+            MessageModel Message = new();
+
+            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+
+            if (identityUser != null)
+            {
+                var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
+
+                Message = _dbContext.Messages.FirstOrDefault(m => m.Id == messageDelId);
+
+                Message.Message = null;
+                
+
+                _dbContext.Messages.Update(Message);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok();
+            }
+
+            return BadRequest("Could not create message");
+        }
 
     }
 }

@@ -21,10 +21,11 @@ body {
 
     <div class="card">
         <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-        <h4><b>Username goes here</b></h4>
+        <h4><b>@MessageObj.User.Username</b></h4>
         <div class="container">
             <p>@MessageObj.Message</p>
         </div>
+        @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
     </div>
 
     <br/>
@@ -42,6 +43,7 @@ body {
 
     [Parameter]
     public int ThreadId { get; set; }
+
     public UserModel CurrentUser { get; set; }
 
     public ThreadModel CurrentThread = new();
@@ -73,13 +75,22 @@ body {
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Message objekt
-
+        Console.WriteLine("CreateMessage() Körs");
         NewMessage.ThreadId = ThreadId;
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
 
 
         //StateHasChanged();
 
+    }
+
+    public async Task DeleteMessage(int id)
+    {
+        Console.WriteLine("Del 1");
+        tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
+
+
+        
     }
 
 }
