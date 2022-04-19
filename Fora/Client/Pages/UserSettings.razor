@@ -12,21 +12,45 @@
 
 @if(loginStatus != null && loginStatus.IsLoggedIn)
 {
-    <h3 class="text-center">You're logged in</h3>
+    <h3 class="text-center">You're logged in as @User.Username</h3>
 
 
+
+
+<div class="row">
+<div class="col-3">
 <h4>Interests</h4>
 <h5>@loadingMessage</h5>
-
-<div class="row-cols-3">
 <ul>
+    
 @foreach (var element in interests)
 {
     
-    <li class="col-7"><em>@element.Name </em><button onclick="@(() => AddInterest(element.Id))" class="btn btn-outline-success"> Add </button></li>
-    
+    <li><em>@element.Name </em><button onclick="@(() => AddInterest(element.Id))" 
+        class="btn btn-outline-success"> Add To Favorites </button></li>
+   
 }
 </ul>
+</div>
+
+
+<div class="col-6"></div>
+@*Favorite Lista*@
+
+    <div class="col-3">
+        <h4>Favorite Interests</h4>
+        <ul>
+            @foreach(var favo in userInterests)
+            {
+                
+                <li><em>@favo.Name </em><button onclick="@(() => RemoveUserInterest(favo.Id))" 
+                class="btn btn-outline-danger"> Remove </button></li>
+            }
+        </ul>
+
+
+
+    </div>
 </div>
 
 <h2> Create a new interest</h2>
@@ -37,10 +61,13 @@
 
 
 
+// ----------------------------------------------------------------------
+// -------------------- User Settings
+<div class="row">
 <h3>Change Password, Delete User and Flag User</h3>
-<div class="col-2">
 <EditForm Model=@User OnSubmit="ChangePassword">
-    
+<div class="col-2">  
+
     <label>Current password:</label>
     <InputText @bind-Value="User.Password"></InputText>
     <br />
@@ -49,16 +76,30 @@
     <br />
     <label>Confirm Password:</label>
     <InputText @bind-Value="confirmPassword" />
-    <input type="submit" value="Change password" />
-   
+    <input type="submit" class="btn-outline-primary" value="Change password" />
+</div>
 </EditForm>
- </div>
-<div>
-    <button @onclick="DeleteUser">Delete user</button>
-    </div>
+ 
+<div class="col-4"></div>
+<div class="col-2">
+    @*Delete User *@
+    <button class="btn-outline-danger" @onclick="DeleteUser">Delete User</button>
+    <br />    
+    @*Ban User *@
+    <button class="btn-outline-warning" @onclick="BanUser">Ban User</button>
+    <br />
+    @*Unban User*@
     
+</div>
+   
+</div>   
 }
 
+@if(loginStatus != null && loginStatus.IsBanned)
+{
+    <h3>This user has been flagged as Banned</h3>
+    <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
+}
 
 
 
@@ -67,6 +108,8 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
+
+    public List<InterestModel> userInterests = new();
 
     string? loadingMessage;
 
@@ -82,24 +125,47 @@
 
     protected override async Task OnInitializedAsync()
     {
-        loadingMessage = "Loading interests...";
-        interests = await InterestManager.GetInterests();
-        loadingMessage = "Finished loading!";
-
-
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         // 2. Skicka token till API för att kolla om vi är inloggade
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
-        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+
+         //This one
+        userInterests = await InterestManager.GetUserInterests(token);                                                                
+
+        loadingMessage = "Loading interests...";
+        interests = await InterestManager.GetInterests();
+
+        loadingMessage = "Finished loading!";
     }
 
-    private void AddInterest(int id)
-    {
-        // Add userinterest to user
+    
 
+    private async Task AddInterest(int id)
+    {
+        var ui = interests.FirstOrDefault(ui => ui.Id == id);
+
+        if(ui != null )
+        {
+            await InterestManager.AddUserInterests(ui, token);
+            userInterests = await InterestManager.GetUserInterests(token);
+            StateHasChanged();
+        }
+    }
+
+    public async Task RemoveUserInterest(int id)
+    {
+        
+         var ui = interests.FirstOrDefault(ui => ui.Id == id);
+
+        if(ui != null)
+        {
+            await InterestManager.RemoveUserInterests(ui, token);
+            userInterests = await InterestManager.GetUserInterests(token);
+            StateHasChanged();
+        }
     }
 
     public async Task CreateNewInterest()
@@ -111,7 +177,6 @@
         await InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
 
         interests = await InterestManager.GetInterests();
-
     }
 
 
@@ -124,8 +189,21 @@
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
     }
 
-    
-     
+    public async Task BanUser()
+    {
+        await UserManager.BanUser(token);        
+        string action = "Banned";
+        NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
+
+
+    }
+    public async Task UnbanUser()
+    {
+        await UserManager.UnbanUser(token);
+        NavigationManager.NavigateTo("usersettings", true);
+    }
+
+
     
 
     public async Task ChangePassword()
@@ -145,22 +223,3 @@
 
 
 
-@*
-● Se intressen man har på sin användare
-● Se alla intressen som finns på appen
-● Skapa nya intressen
-● Lägga till redan existerande intressen till sin användare
-● Ta bort intressen från sin användare
-● Ta bort intressen man själv skapat från appen
-● Byta lösenord
-● Se, ändra och ta bort profilbild
-● Ta bort intressen om man är admin
-● Se om man är admin
-● Tilldela adminrättigheter till andra användare om man är admin
-● Ta bort adminrättigheter från andra användare om man är admin
-● Banna andra användare om man är admin
-● Avbanna andra användare om man är admin
-● Möjligheten bestämma målspråk för översättning (se avsnittet “Bedömning - Niceto-have” nedan)
-● Se trådar man skapat
-● Flagga sin användare som borttagen
-● Ta bort sitt användare*@

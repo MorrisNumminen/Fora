@@ -87,7 +87,8 @@ namespace Fora.Server.Controllers
 
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
             {
-                //await _signInManager.UserManager.UpdateAsync(user);
+                LoginDto loginStatus = new();
+                loginStatus.IsLoggedIn = true;
 
                 return Ok(user.Token);
             }
@@ -98,30 +99,27 @@ namespace Fora.Server.Controllers
         [HttpGet("check/{token}")]
         public async Task<ActionResult<LoginDto>> CheckUserLogin([FromRoute] string token)
         {
+            
             // See what user has the specified token (in the db)
-
-
-
             var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            var dbUser = _context.Users.FirstOrDefault(u => u.Username == userWithToken.UserName);
 
             if (userWithToken != null)
             {
                 LoginDto loginStatus = new();
-                loginStatus.IsLoggedIn = true;
+                
 
-                // Is user Deleted?
-
-                var roleCheckResult = await _signInManager.UserManager.IsInRoleAsync(userWithToken, "deleted");
-
-                if (roleCheckResult)
-                {
-                    loginStatus.IsDeleted = true;
+                if (dbUser != null && dbUser.Banned == false)
+                {                    
+                    loginStatus.IsLoggedIn = true;                   
                 }
-                else if (roleCheckResult)
-                {
-                    loginStatus.IsBanned = true;
+                else if(dbUser != null && dbUser.Banned) 
+                {                   
+                    loginStatus.IsBanned = true;                  
                 }
-                return Ok(loginStatus);
+               
+                             
+                 return Ok(loginStatus);           
             }
 
             return BadRequest("User not found");
@@ -134,6 +132,50 @@ namespace Fora.Server.Controllers
 
 
 
+        }
+
+        [HttpGet("ban/{token}")]
+        public async Task<ActionResult> BanUser(string token)
+        {
+
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            if(userWithToken != null)
+            {
+                var dbUser = _context.Users.FirstOrDefault(u => u.Username == userWithToken.UserName);
+               
+
+                if (dbUser != null)
+                {
+                    dbUser.Banned = true;
+                    await _context.SaveChangesAsync();
+                    
+                }                                                            
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet("unban/{token}")]
+        public async Task<ActionResult> UnbanUser(string token)
+        {
+           
+            var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
+            if (userWithToken != null)
+            {
+                var dbUser = _context.Users.FirstOrDefault(u => u.Username == userWithToken.UserName);
+
+
+                if (dbUser != null)
+                {
+                    dbUser.Banned = false;
+                    await _context.SaveChangesAsync();
+
+                }
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
         // DELETE api/<UsersController>/5
