@@ -1,34 +1,57 @@
-﻿@using Fora.Shared
+﻿@using Blazored.LocalStorage
+@using Fora.Shared
+@inject IInterestManager _interestManager
+@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorage;
 
 <PageTitle>Intrests</PageTitle>
-<style>
-body {
-  background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
-}
-</style>
 
 @page "/intrests"
 
 
-<h3>Intrests</h3>
+<h3>All Intrests</h3>
 
-@foreach( var intrests in userInterestsPLaceHolder)
+<div class="row">
+
+@foreach( var intrests in allInterests)
 {
-    @intrests;
+   <button  @onclick="ToThreads">@intrests.Name</button> 
     <br/>
 }
 
-@code {
-    //placeholder list
-    public List<string> userInterestsPLaceHolder = new();
 
+</div>
+
+
+
+
+
+
+
+@code {
+    private List<InterestModel> allInterests = new();
+    private List<InterestModel> userInterests = new();
+    private string? token;
 
     protected override async Task OnInitializedAsync()
     {
-        userInterestsPLaceHolder.Add("Souls like games");
-        userInterestsPLaceHolder.Add("Rouge Like");
-        userInterestsPLaceHolder.Add("FPS");
-        userInterestsPLaceHolder.Add("Brawlers");
+        token = await _localStorage.GetItemAsStringAsync("token");
+
+        var interests = await _interestManager.GetInterests();
+        if (interests != null)
+        {
+            allInterests = interests;
+        }
+
+        var uInterests = await _interestManager.GetUserInterests(token);
+        if(uInterests != null)
+        {
+            userInterests = uInterests;
+        }
     }
 
+    public async Task ToThreads()
+    {
+        _navigationManager.NavigateTo("threads");
+    }
 }

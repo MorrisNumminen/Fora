@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Fora.Client.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fora.Server.Controllers
 {
@@ -20,10 +21,11 @@ namespace Fora.Server.Controllers
 
         // GET api/<UsersController>
         [HttpGet("getinterests")]
-        public async Task<List<InterestModel>> GetInterests()
+        public async Task<ActionResult<List<InterestModel>>> GetAsync()
         {
-            // Returnera lista med interests
-            return _dbContext.Interests.ToList();
+            List<InterestModel> list = new();
+            list = await _dbContext.Interests.ToListAsync();
+            return Ok(list);
         }
 
         [HttpPost("AddUserInterest")]
