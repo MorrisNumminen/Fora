@@ -9,16 +9,35 @@
 @page "/intrests"
 
 
-<h3>All Intrests</h3>
+
 
 <div class="row">
 
-@foreach( var intrests in allInterests)
+    <div class="col-6">
+        <h3>All Intrests</h3>
+@foreach(var interests in allInterests)
 {
-   <button  @onclick="ToThreads">@intrests.Name</button> 
-    <br/>
+    <div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">@interests.Name</h5>
+    <a @onclick="ToThreads" class="btn btn-primary">Threads</a>
+  </div>
+</div>
 }
+    </div>
 
+    <div class="col-6">
+        <h3> Favorite Interests</h3>
+@foreach( var interests in userInterests)
+{   
+    <div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">@interests.Name</h5>
+    <a @onclick="ToThreads" class="btn btn-success">Threads</a>
+  </div>
+</div>
+}
+    </div>
 
 </div>
 
@@ -37,8 +56,8 @@
     {
         token = await _localStorage.GetItemAsStringAsync("token");
 
-        var interests = await _interestManager.GetInterests();
-        if (interests != null)
+        var interests = await _interestManager.GetInterests();      
+        if(interests != null)
         {
             allInterests = interests;
         }
@@ -50,8 +69,9 @@
         }
     }
 
-    public async Task ToThreads()
+    private async Task ToThreads()
     {
         _navigationManager.NavigateTo("threads");
     }
+   
 }

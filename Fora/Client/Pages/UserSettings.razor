@@ -16,7 +16,7 @@
 
 
 
-
+    
 <div class="row">
 <div class="col-3">
 <h4>Interests</h4>
@@ -69,14 +69,15 @@
 <div class="col-2">  
 
     <label>Current password:</label>
-    <InputText @bind-Value="User.Password"></InputText>
+    <InputText type="password" @bind-Value="User.Password"></InputText>
     <br />
         <label>New password:</label>
-    <InputText @bind-Value="newPassword" />
+    <InputText type="password" @bind-Value="newPassword" />
     <br />
     <label>Confirm Password:</label>
-    <InputText @bind-Value="confirmPassword" />
+    <InputText type="password" @bind-Value="confirmPassword" />
     <input type="submit" class="btn-outline-primary" value="Change password" />
+    <a>@Message</a>
 </div>
 </EditForm>
  
@@ -112,7 +113,7 @@
     public List<InterestModel> userInterests = new();
 
     string? loadingMessage;
-
+    string? Message;
     string tokenFromLocalStorage = "Före token";
 
     public UserDto User { get; set; } = new();
@@ -127,12 +128,8 @@
     {
         token = await LocalStorage.GetItemAsStringAsync("token");
 
-        // 2. Skicka token till API för att kolla om vi är inloggade
-
         loginStatus = await UserManager.CheckUserLogin(token);
 
-
-         //This one
         userInterests = await InterestManager.GetUserInterests(token);                                                                
 
         loadingMessage = "Loading interests...";
@@ -141,7 +138,7 @@
         loadingMessage = "Finished loading!";
     }
 
-    
+
 
     private async Task AddInterest(int id)
     {
@@ -157,8 +154,8 @@
 
     public async Task RemoveUserInterest(int id)
     {
-        
-         var ui = interests.FirstOrDefault(ui => ui.Id == id);
+
+        var ui = interests.FirstOrDefault(ui => ui.Id == id);
 
         if(ui != null)
         {
@@ -204,7 +201,7 @@
     }
 
 
-    
+
 
     public async Task ChangePassword()
     {
@@ -215,6 +212,7 @@
         if(newPassword == confirmPassword && token != null)
         {
             await UserManager.ChangePasswordUser(User, newPassword, token);
+            Message = "Password Changed";
         }
     }
 
