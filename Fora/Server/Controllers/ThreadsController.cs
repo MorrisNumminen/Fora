@@ -130,5 +130,11 @@ namespace Fora.Server.Controllers
             return BadRequest("Could not create message");
         }
 
+        //[HttpGet]
+        //public async Task<ActionResult<int>> GetThreadId()
+        //{
+        //    var threadID = await _dbContext.Threads.ThreadId;
+        //}
+
     }
 }

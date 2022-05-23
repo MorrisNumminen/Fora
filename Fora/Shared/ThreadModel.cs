@@ -6,9 +6,9 @@ namespace Fora.Shared
     public class ThreadModel
     {
         [Key]
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Name { get; set; } = String.Empty;
-        public List<MessageModel>? Messages { get; set; }
+        public List<MessageModel> Messages { get; set; }
 
         // Relations
         [ForeignKey(nameof(Interest))]
