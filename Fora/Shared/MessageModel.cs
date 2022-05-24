@@ -7,7 +7,10 @@ namespace Fora.Shared
     {
         [Key]
         public int Id { get; set; }
+        [MinLength(5)]
         public string? Message { get; set; } = String.Empty;
+        public string Date { get; set; }
+        public bool Edited { get; set; }
 
         // Relations
         [ForeignKey(nameof(Thread))]

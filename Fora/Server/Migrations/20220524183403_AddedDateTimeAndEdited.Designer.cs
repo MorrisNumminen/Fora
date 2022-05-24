@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fora.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220419081934_MoreNullables")]
-    partial class MoreNullables
+    [Migration("20220524183403_AddedDateTimeAndEdited")]
+    partial class AddedDateTimeAndEdited
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -96,11 +96,17 @@ namespace Fora.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Message")
+                    b.Property<string>("Date")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ThreadId")
+                    b.Property<bool>("Edited")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ThreadId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserId")
@@ -236,9 +242,7 @@ namespace Fora.Server.Migrations
                 {
                     b.HasOne("Fora.Shared.ThreadModel", "Thread")
                         .WithMany("Messages")
-                        .HasForeignKey("ThreadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ThreadId");
 
                     b.HasOne("Fora.Shared.UserModel", "User")
                         .WithMany("Messages")

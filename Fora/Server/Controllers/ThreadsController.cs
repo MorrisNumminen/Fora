@@ -84,15 +84,12 @@ namespace Fora.Server.Controllers
         [HttpPost("createmessage")]
         public async Task<ActionResult<string>> CreateMessage([FromBody] MessageModel messageToCreate, [FromQuery] string token)
         {
-            MessageModel newMessage = new();
-
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
 
             if (identityUser != null)
             {
                 var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
                 messageToCreate.User = user;
-
                 _dbContext.Messages.Add(messageToCreate);
                 await _dbContext.SaveChangesAsync();
 

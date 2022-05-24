@@ -94,6 +94,13 @@ namespace Fora.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Edited")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 

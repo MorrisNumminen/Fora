@@ -6,7 +6,7 @@
 @page "/thread/{ThreadId:int}"
 
 
-<PageTitle>Thread Name goes here</PageTitle>
+<PageTitle>Thread Page</PageTitle>
 <style>
 body {
   background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
@@ -14,29 +14,38 @@ body {
 </style>
 
 
+
 <h3>@CurrentThread.Name</h3>
 
+<div>
+    <EditForm Model="@NewMessage" OnValidSubmit="CreateMessage">
 @foreach( var MessageObj in Messages)
 {
 
     <div class="card">
         <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-        <h4><b>@MessageObj.User.Username</b></h4>
         <div class="container">
-            <p>@MessageObj.Message</p>
+        <div class="card bg-primary">
+            <p>Posted at: @MessageObj.Date</p>
+            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
         </div>
-        @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
-    </div>
+    }
+    else
+    {
+        <div class="card">
+            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
+            <h4><b>@MessageObj.User.Username</b></h4>
+            <div class="m-lg-3">
+                <p>@MessageObj.Message</p>
+            </div>
 
+            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
+        </div>
+    }
     <br/>
 }
 
-<div>
-<EditForm Model="@NewMessage" OnSubmit="CreateMessage">
-    <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
-    <button type="submit">Post Message</button>
-</EditForm>
-</div>
+
 
 
 @code {
@@ -44,28 +53,30 @@ body {
     [Parameter]
     public int ThreadId { get; set; }
 
-    public UserModel CurrentUser { get; set; }
+    public ApplicationUser CurrentUser { get; set; }
 
     public ThreadModel CurrentThread = new();
 
     public MessageModel NewMessage { get; set; } = new();
 
+
     //public MsgDto NewMessage { get; set; } = new();
 
     public List<MessageModel> Messages = new();
-
-
-
     string tokenFromLocalStorage = "Före token";
+    private string? token;
 
 
     protected override async Task OnInitializedAsync()
     {
+        token = await LocalStorage.GetItemAsStringAsync("token");
+
+        CurrentUser = await UserManager.GetAsync(token);
 
         Console.WriteLine(ThreadId);
 
         Messages = await ThreadManager.GetThreadMessages(ThreadId);
-
+        Messages.Reverse();
     }
 
 
@@ -75,13 +86,13 @@ body {
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Message objekt
-        Console.WriteLine("CreateMessage() Körs");
         NewMessage.ThreadId = ThreadId;
+        NewMessage.Date = DateTime.Now.ToString();
+        Console.WriteLine("Date:" + NewMessage.Date);
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
-
-
-        //StateHasChanged();
-
+        Messages = await ThreadManager.GetThreadMessages(ThreadId);
+        Messages.Reverse();
+        StateHasChanged();
     }
 
     public async Task DeleteMessage(int id)

@@ -1,6 +1,5 @@
 global using Fora.Server.Data;
 global using Fora.Shared;
-global using Fora.Server.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
