@@ -78,9 +78,8 @@ body {
         Console.WriteLine("CreateMessage() Körs");
         NewMessage.ThreadId = ThreadId;
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
-
-
-        //StateHasChanged();
+        Messages = await ThreadManager.GetThreadMessages(ThreadId);
+        StateHasChanged();
 
     }
 

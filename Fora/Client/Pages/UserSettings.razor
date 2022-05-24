@@ -111,6 +111,7 @@
     public InterestModel Interest { get; set; } = new();
 
     public List<InterestModel> userInterests = new();
+    public List<ThreadModel> myThreads = new();
 
     string? loadingMessage;
     string? Message;
@@ -122,6 +123,7 @@
     private string? token;
     private string? newPassword;
     private string? confirmPassword;
+
 
 
     protected override async Task OnInitializedAsync()
