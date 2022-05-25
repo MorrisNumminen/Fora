@@ -28,7 +28,10 @@
     
     <li><em>@element.Name </em><button onclick="@(() => AddInterest(element.Id))" 
         class="btn btn-outline-success"> Add To Favorites </button></li>
-   
+                   @* if(CurrentUser.Username == element.User.Username)
+                    {
+                        <a onclick="@(() => RemoveUserInterest(element.Id))class="btn btn-danger">Delete Interest</a>
+                    }*@
 }
 </ul>
 </div>
@@ -109,7 +112,7 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
-
+   // public ApplicationUser CurrentUser { get; set; }
     public List<InterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
 
