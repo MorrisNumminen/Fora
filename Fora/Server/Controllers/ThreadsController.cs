@@ -67,7 +67,9 @@ namespace Fora.Server.Controllers
         var messages = _dbContext.Messages.Include(m => m.User).Where(m => m.ThreadId == CurrentThreadId).Select(m => new MessageModel
             {
 
-            Message = m.Message,
+                Message = m.Message,
+                Date = m.Date,
+                Edited = m.Edited,
                 User = new UserModel()
                 {
                     Id = m.User.Id,

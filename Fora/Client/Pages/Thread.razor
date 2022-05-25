@@ -19,14 +19,51 @@ body {
 
 <div>
     <EditForm Model="@NewMessage" OnValidSubmit="CreateMessage">
+        <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
+        <button type="submit">Post Message</button>
+    </EditForm>
+</div>
+
 @foreach( var MessageObj in Messages)
 {
-
-    <div class="card">
-        <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-        <div class="container">
+    @if (CurrentUser.UserName == MessageObj.User.Username && EditThisMessage)
+    {
         <div class="card bg-primary">
-            <p>Posted at: @MessageObj.Date</p>
+            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
+            <h4><b>@MessageObj.User.Username</b></h4>
+            <div class="m-lg-3 card card-body">
+                <EditForm Model="@EditedMessage" OnValidSubmit="SaveMessage">
+                    <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:">@MessageObj.Message</InputTextArea>
+                    <button class="mx-2 my-1" type="submit">Save changes</button>
+                </EditForm>
+            </div>
+            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
+        </div>
+
+            @EditedMessage.Message = @MessageObj.Message;
+
+    }
+    else if (CurrentUser.UserName == MessageObj.User.Username)
+    {
+        <div class="card bg-primary">
+            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
+            <h4><b>@MessageObj.User.Username</b></h4>
+            <div class="m-lg-3 card card-body">
+                <p>@MessageObj.Message</p>
+            </div>
+            <div class="mx-2 my-1">
+                @if(@MessageObj.Edited)
+                {
+                    <p class="text-end"><small>Posted at: @MessageObj.Date (Edited)</small></p>
+                    <btn class="btn mx-2 my-2 btn-outline-info">Edit</btn>
+                }
+                else
+                {
+                    <p class="text-end"><small>Posted at: @MessageObj.Date</small></p>
+                    <btn class="btn btn-outline-info" @onclick="EditMessage">Edit</btn>
+                }
+
+            </div>
             @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
         </div>
     }
@@ -35,10 +72,19 @@ body {
         <div class="card">
             <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
             <h4><b>@MessageObj.User.Username</b></h4>
-            <div class="m-lg-3">
+            <div class="m-lg-3 card card-body">
                 <p>@MessageObj.Message</p>
             </div>
-
+            <div class="mx-2 my-1">
+                @if(@MessageObj.Edited)
+                {
+                    <p class="text-end"><small>Posted at: @MessageObj.Date (Edited)</small></p>
+                }
+                else
+                {
+                    <p class="text-end"><small>Posted at: @MessageObj.Date</small></p>
+                }
+            </div>
             @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
         </div>
     }
@@ -58,7 +104,8 @@ body {
     public ThreadModel CurrentThread = new();
 
     public MessageModel NewMessage { get; set; } = new();
-
+    public bool EditThisMessage { get; set; } = false;
+    public MessageModel EditedMessage { get; set; }
 
     //public MsgDto NewMessage { get; set; } = new();
 
@@ -72,12 +119,10 @@ body {
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         CurrentUser = await UserManager.GetAsync(token);
-
-        Console.WriteLine(ThreadId);
-
         Messages = await ThreadManager.GetThreadMessages(ThreadId);
         Messages.Reverse();
     }
+
 
 
     public async Task CreateMessage()
@@ -88,20 +133,27 @@ body {
         // Skickar token tillsammans med Message objekt
         NewMessage.ThreadId = ThreadId;
         NewMessage.Date = DateTime.Now.ToString();
-        Console.WriteLine("Date:" + NewMessage.Date);
+
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
         Messages = await ThreadManager.GetThreadMessages(ThreadId);
         Messages.Reverse();
         StateHasChanged();
     }
 
+    public void EditMessage()
+    {
+        EditThisMessage = true;
+        StateHasChanged();
+    }
+    public void SaveMessage()
+    {
+        Console.WriteLine("bruh");
+    }
+
+
     public async Task DeleteMessage(int id)
     {
-        Console.WriteLine("Del 1");
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
-
-
-        
     }
 
 }
