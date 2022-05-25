@@ -59,25 +59,9 @@ namespace Fora.Server.Controllers
         [HttpGet("getthreadmessages/{threadId}")]
         public async Task<List<MessageModel>> GetThreadMessages(int threadId)
         {
-            // Returnera lista med threads
-            //return _dbContext.Messages.ToList();
-            int CurrentThreadId = threadId;
-            Console.WriteLine(CurrentThreadId);
-
-        var messages = _dbContext.Messages.Include(m => m.User).Where(m => m.ThreadId == CurrentThreadId).Select(m => new MessageModel
-            {
-
-                Message = m.Message,
-                Date = m.Date,
-                Edited = m.Edited,
-                User = new UserModel()
-                {
-                    Id = m.User.Id,
-                    Username = m.User.Username,
-                    Banned = m.User.Banned,
-                    Deleted = m.User.Deleted,
-                }
-            }).ToList();
+                       
+            List<MessageModel> messages = await _dbContext.Messages.Include(x => x.User).ToListAsync();
+            messages = messages.Where(m => m.ThreadId == threadId).ToList();
 
             return messages;
         }
@@ -99,6 +83,14 @@ namespace Fora.Server.Controllers
             }
 
             return BadRequest("Could not create message");
+        }
+
+        [HttpPut("updatemessage")]
+        public async Task<ActionResult> PutMessageAsync([FromBody] MessageModel message)
+        {
+            _dbContext.Messages.Update(message);
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0 ? Ok() : BadRequest();
         }
 
         //POST a new message

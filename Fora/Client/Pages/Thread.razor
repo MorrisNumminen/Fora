@@ -26,22 +26,18 @@ body {
 
 @foreach( var MessageObj in Messages)
 {
-    @if (CurrentUser.UserName == MessageObj.User.Username && EditThisMessage)
+    @if (CurrentUser.UserName == MessageObj.User.Username)
     {
         <div class="card bg-primary">
             <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
             <h4><b>@MessageObj.User.Username</b></h4>
             <div class="m-lg-3 card card-body">
-                <EditForm Model="@EditedMessage" OnValidSubmit="SaveMessage">
-                    <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:">@MessageObj.Message</InputTextArea>
+                <EditForm Model="@EditedMessage" OnValidSubmit="() => SaveMessage(MessageObj)">
+                    <InputTextArea @bind-Value="EditedMessage.Message">@MessageObj.Message</InputTextArea>
                     <button class="mx-2 my-1" type="submit">Save changes</button>
                 </EditForm>
-            </div>
-            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
-        </div>
-
-            @EditedMessage.Message = @MessageObj.Message;
-
+            </div>          
+        </div>          
     }
     else if (CurrentUser.UserName == MessageObj.User.Username)
     {
@@ -105,11 +101,12 @@ body {
 
     public MessageModel NewMessage { get; set; } = new();
     public bool EditThisMessage { get; set; } = false;
-    public MessageModel EditedMessage { get; set; }
+    public MessageModel EditedMessage { get; set; } = new();
 
     //public MsgDto NewMessage { get; set; } = new();
 
     public List<MessageModel> Messages = new();
+
     string tokenFromLocalStorage = "Före token";
     private string? token;
 
@@ -145,9 +142,11 @@ body {
         EditThisMessage = true;
         StateHasChanged();
     }
-    public void SaveMessage()
+    public async Task SaveMessage(MessageModel message)
     {
-        Console.WriteLine("bruh");
+        message.Message = EditedMessage.Message;
+        await ThreadManager.PutMessageAsync(message);
+        StateHasChanged();
     }
 
 

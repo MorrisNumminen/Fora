@@ -26,9 +26,18 @@ namespace Fora.Client.Services
 
         }
 
-        public async Task<List<MessageModel>> GetThreadMessages(int threadId)
+        public async Task<List<MessageModel?>> GetThreadMessages(int threadId)
         {
-            return await _httpClient.GetFromJsonAsync<List<MessageModel>>($"api/Threads/getthreadmessages/{threadId}");
+
+            HttpResponseMessage response = await _httpClient.GetAsync($"api/Threads/getthreadmessages/{threadId}");
+            var test = response.Content.ReadAsStream();
+            List<MessageModel?> message = null;                                     
+            if (response.IsSuccessStatusCode)
+            {
+                message = await response.Content.ReadAsAsync<List<MessageModel?>>();
+            }
+            return message;
+          
         }
 
         public async Task<string> CreateNewMessage(MessageModel messageToCreate, string token)
@@ -40,7 +49,7 @@ namespace Fora.Client.Services
             return null;
 
         }
-
+        
         public async Task DeleteMessage(int messageDelId, string token)
         {
             // Lägg till ett message i db
@@ -48,7 +57,10 @@ namespace Fora.Client.Services
             await _httpClient.PostAsJsonAsync<int>($"api/Threads/deletemessage?token={token}", messageDelId);
         }
 
-
-
+        public async Task PutMessageAsync(MessageModel message)
+        {
+            
+           var response = await _httpClient.PutAsJsonAsync<MessageModel>($"api/Threads/updatemessage", message);
+        }
     }
 }
