@@ -18,57 +18,56 @@ body {
 }
 </style>
 
-<EditForm Model=SearchTerm OnValidSubmit=@HandelValidSubmit>
+<EditForm Model=SearchTerm OnValidSubmit=@HandleValidSubmit>
     <label for="SearchTerm">Search</label>
     <InputText @bind-Value="SearchTerm"></InputText>
     <input type="submit"/>
 </EditForm>
-<p>To get all threads, enter nothing in the feild and press search</p>
+<p>To get all threads, enter nothing in the feild and press submit</p>
 
 <h3>Threads</h3>
 <h4>Start A Topic</h4>
-@*<EditForm Model="@Thread" OnSubmit="CreateNewThread">
+<EditForm Model="@Thread" OnValidSubmit="@FormSubmitted">
     <InputText @bind-Value="Thread.Name" type="text" placeholder="Title for thread"></InputText>
     <button type="submit">Start topic!</button>
-</EditForm>*@
+</EditForm>
 <br />
 
-
-@if(SearchList.Count() > 0)
-{
-    foreach(var thread in SearchList)
-    {
-        if(searchCounter >= NumberOfSearchMsgsList.Count())
-        {
-            searchCounter = 0;
-        }
-    <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-    <p>Messages: @NumberOfSearchMsgsList[searchCounter]</p>
-    searchCounter++;
-    }
-}
-else if(SearchList.Count() == 0)
+@if(SearchList.Count() == 0 && NumberOfMsgsList.Count() != 0)
 {
     @foreach(var thread in ThreadsList)
     {
-        if(counter == NumberOfMsgsList.Count())
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <p>Messages: @NumberOfMsgsList[counter]</p>
+        if (counter < NumberOfMsgsList.Count() && counter + 1 != NumberOfMsgsList.Count())
         {
-            counter = 0;
+            counter++; 
         }
-    <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-    <p>Messages: @NumberOfMsgsList[counter]</p>
-    counter++;
+        else
+        {
+            continue;
+        }
+
     }
 }
+else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0)
+{
+    foreach(var thread in SearchList)
+    {
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <p>Messages: @NumberOfSearchMsgsList[searchCounter]</p>
+        if (searchCounter < NumberOfSearchMsgsList.Count() && searchCounter + 1 != NumberOfSearchMsgsList.Count())
+        {
+            searchCounter++;
+        }
+        else
+        {
+            continue;
+        }
 
-@*<EditForm Model=@Thread OnSubmit=FormSubmitted>    skap ny tråd exempel
-    <div class="form-group">
-        <label for="Name">Thread Title</label>
-        <InputText @bind-Value="Thread.Name" class="form-control" id="Name"></InputText>
-    </div>
-    <input type="submit" class="btn btn-primary" value="Submit"/>
-</EditForm>
-*@
+    }
+    SearchList.Clear();
+}
 
 @code {
     //hämta ut alla namn(strings) på threads från den riktiga listan och spara det i en ny lista
@@ -77,6 +76,7 @@ else if(SearchList.Count() == 0)
     public Threads()
     {
     }
+    public bool isFormvalid { get; set; }
     public int counter { get; set; }
     public int searchCounter { get; set; }
     public int PlaceHolderID { get; set; }
@@ -102,18 +102,34 @@ else if(SearchList.Count() == 0)
         searchCounter = 0;
         PlaceHolderID = 1;
         ThreadsList = await ThreadManager.GetThreads();
-
-        /*NumberOfMsgsList.Add(null);*/ //Första index 0 är inte null längre. Index 0 tilhör ThreadId 1, Index 1 tillhör ThreadId 2 ovs
         await MsgCounter();
     }
 
-    public async void FormSubmitted(EditContext editContext) //Till skapa en ny thread
+    public async void FormSubmitted(EditContext editContext) // validates the create new thread form
     {
-        bool isFormvalid = editContext.Validate();
+        isFormvalid = editContext.Validate();
         if (isFormvalid)
         {
+            counter = 0;
+            PlaceHolderID = 1;
+            NumberOfMsgsList.Clear();
             await CreateNewThread(Thread.Name);
         }
+        StateHasChanged();
+    }
+
+    public async void HandleValidSubmit(EditContext editContext) // validates the search form
+    {
+        bool isFormValid = editContext.Validate();
+        if (isFormValid)
+        {
+            searchCounter = 0;
+            SearchList.Clear();
+            NumberOfSearchMsgsList.Clear();
+            OnSearch(SearchTerm);
+            await SearchListMsgCounter();
+        }
+        StateHasChanged();
     }
 
     public async Task CreateNewThread(string threadName)
@@ -129,7 +145,6 @@ else if(SearchList.Count() == 0)
 
         ThreadsList = await ThreadManager.GetThreads();
         await MsgCounter();
-        StateHasChanged();
     }
 
     public async Task MsgCounter()
@@ -163,18 +178,9 @@ else if(SearchList.Count() == 0)
         return msgsInThread;
     }
 
-    public async void HandelValidSubmit(EditContext editContext) // validates the search form
-    {
-        bool isFormValid = editContext.Validate();
-        if (isFormValid)
-        {
-            await OnSearch(SearchTerm);
-            await SearchListMsgCounter();
-            StateHasChanged();
-        }
-    }
 
-    public async Task SearchListMsgCounter()
+
+    public async Task<List<int?>> SearchListMsgCounter()
     {
         foreach (var thread in SearchList)
         {
@@ -191,9 +197,10 @@ else if(SearchList.Count() == 0)
                 NumberOfSearchMsgsList.Add(NumberOfSearchMsgs);
             }
         }
+        return NumberOfSearchMsgsList;
     }
 
-    public async Task<List<ThreadModel>> OnSearch(string SearchTerm)
+    public List<ThreadModel> OnSearch(string SearchTerm)
     {
         if(SearchTerm != "") //if SearchTerm contains the word/sentance enterd in the search feild
         {
