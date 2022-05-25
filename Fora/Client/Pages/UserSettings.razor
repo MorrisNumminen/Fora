@@ -5,6 +5,7 @@
 @using Blazored.LocalStorage
 @inject IUserManager UserManager;
 @inject IInterestManager InterestManager;
+@inject IThreadManager ThreadManager;
 @inject ILocalStorageService LocalStorage;
 @inject NavigationManager NavigationManager
 @page "/usersettings"
@@ -37,7 +38,20 @@
 </div>
 
 
-<div class="col-6"></div>
+<div class="col-3">
+
+   @* <h4>My Threads</h4>
+        <ul>
+            @foreach(var thread in userThreads)
+            {
+                    if(CurrentUser.Username == thread.User.Username)
+                    {
+                        <li>@thread.Name </li>
+                    }                
+            }
+        </ul>*@
+
+</div>
 @*Favorite Lista*@
 
     <div class="col-3">
@@ -112,9 +126,10 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
-   // public ApplicationUser CurrentUser { get; set; }
+    // public ApplicationUser CurrentUser { get; set; }
     public List<InterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
+    public List<ThreadModel> userThreads = new();
 
     string? loadingMessage;
     string? Message;
@@ -135,7 +150,9 @@
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
-        userInterests = await InterestManager.GetUserInterests(token);                                                                
+        userInterests = await InterestManager.GetUserInterests(token);
+
+        userThreads = await ThreadManager.GetThreads();
 
         loadingMessage = "Loading interests...";
         interests = await InterestManager.GetInterests();
