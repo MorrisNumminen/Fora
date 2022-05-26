@@ -26,64 +26,45 @@ body {
 
 @foreach( var MessageObj in Messages)
 {
-    @if (CurrentUser.UserName == MessageObj.User.Username)
+    if(CurrentUser.UserName == MessageObj.User.Username)
     {
-        <div class="card bg-primary">
-            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-            <h4><b>@MessageObj.User.Username</b></h4>
-            <div class="m-lg-3 card card-body">
-                <EditForm Model="@EditedMessage" OnValidSubmit="() => SaveMessage(MessageObj)">
-                    <InputTextArea @bind-Value="EditedMessage.Message">@MessageObj.Message</InputTextArea>
-                    <button class="mx-2 my-1" type="submit">Save changes</button>
-                </EditForm>
-            </div>          
-        </div>          
-    }
-    else if (CurrentUser.UserName == MessageObj.User.Username)
-    {
-        <div class="card bg-primary">
-            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-            <h4><b>@MessageObj.User.Username</b></h4>
-            <div class="m-lg-3 card card-body">
-                <p>@MessageObj.Message</p>
-            </div>
-            <div class="mx-2 my-1">
-                @if(@MessageObj.Edited)
-                {
-                    <p class="text-end"><small>Posted at: @MessageObj.Date (Edited)</small></p>
-                    <btn class="btn mx-2 my-2 btn-outline-info">Edit</btn>
-                }
-                else
-                {
-                    <p class="text-end"><small>Posted at: @MessageObj.Date</small></p>
-                    <btn class="btn btn-outline-info" @onclick="EditMessage">Edit</btn>
-                }
-
-            </div>
-            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
-        </div>
+        Color = "bg-primary";
     }
     else
     {
-        <div class="card">
+        Color = "";
+    }
+    <div class="card @Color">
             <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
             <h4><b>@MessageObj.User.Username</b></h4>
             <div class="m-lg-3 card card-body">
-                <p>@MessageObj.Message</p>
-            </div>
-            <div class="mx-2 my-1">
-                @if(@MessageObj.Edited)
+            @if(CurrentUser.UserName == MessageObj.User.Username){
+                if (EditState)
                 {
-                    <p class="text-end"><small>Posted at: @MessageObj.Date (Edited)</small></p>
+                    <EditForm Model="@EditedMessage" OnValidSubmit="() => SaveMessage(MessageObj)">
+                        <InputTextArea @bind-Value="EditedMessage.Message">@MessageObj.Message</InputTextArea>
+                        <button class="mx-2 my-1" type="submit">Save changes</button>
+                    </EditForm>
                 }
                 else
                 {
-                    <p class="text-end"><small>Posted at: @MessageObj.Date</small></p>
+                    <p>@MessageObj.Message</p>
+                    <div>
+                        <btn class="btn btn-outline-info" @onclick="EditMessage" >Edit</btn>
+                    </div>
                 }
-            </div>
-            @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
-        </div>
-    }
+
+            }
+            else
+            {
+                <p>@MessageObj.Message</p>
+            }
+
+            </div>          
+        </div>          
+
+
+
     <br/>
 }
 
@@ -100,8 +81,11 @@ body {
     public ThreadModel CurrentThread = new();
 
     public MessageModel NewMessage { get; set; } = new();
-    public bool EditThisMessage { get; set; } = false;
     public MessageModel EditedMessage { get; set; } = new();
+
+    public bool EditState { get; set; }
+    public int EditValue { get; set; }
+    public string Color { get; set; }
 
     //public MsgDto NewMessage { get; set; } = new();
 
@@ -124,6 +108,8 @@ body {
 
     public async Task CreateMessage()
     {
+
+
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
@@ -137,17 +123,37 @@ body {
         StateHasChanged();
     }
 
-    public void EditMessage()
+    public async Task EditMessage()
     {
-        EditThisMessage = true;
-        StateHasChanged();
+        EditState = true;
     }
+
     public async Task SaveMessage(MessageModel message)
     {
+
         message.Message = EditedMessage.Message;
+
         await ThreadManager.PutMessageAsync(message);
-        StateHasChanged();
+        EditState = false;
+
     }
+
+
+
+
+
+    //public void EditMessage()
+    //{
+    //    EditThisMessage = true;
+    //    StateHasChanged();
+    //}
+    //public async Task SaveMessage(string message, int id)
+    //{
+    //    //message.Message = EditedMessage.Message;
+    //    //await ThreadManager.PutMessageAsync(message);
+    //    Messages = await ThreadManager.GetThreadMessages(ThreadId);
+    //    StateHasChanged();
+    //}
 
 
     public async Task DeleteMessage(int id)
