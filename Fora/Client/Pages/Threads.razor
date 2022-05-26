@@ -86,7 +86,6 @@ else if (SearchList.Count() > 0)
     protected override async Task OnInitializedAsync()
     {
         //    return base.OnInitializedAsync();
-
         ThreadsList = await ThreadManager.GetThreads();
         //ThreadsList.Sort();
     }

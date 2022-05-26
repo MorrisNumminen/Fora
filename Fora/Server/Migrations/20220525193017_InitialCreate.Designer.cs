@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fora.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220411095233_SeedData")]
-    partial class SeedData
+    [Migration("20220525193017_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -96,11 +96,17 @@ namespace Fora.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Message")
+                    b.Property<string>("Date")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ThreadId")
+                    b.Property<bool>("Edited")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ThreadId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserId")
@@ -123,7 +129,7 @@ namespace Fora.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("InterestId")
+                    b.Property<int?>("InterestId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -140,21 +146,63 @@ namespace Fora.Server.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Threads");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Introduce yourself!"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "DS3 Cheat codes plz"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "How to get rich in sims 66"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Why is my game lagging???"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "How to git gud"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "New Lego City Speedrun Record!"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "GTA hydra abuse"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Tetris laggy. What is my bottleneck??? help"
+                        });
                 });
 
             modelBuilder.Entity("Fora.Shared.UserInterestModel", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("InterestId")
+                    b.Property<int?>("InterestId")
                         .HasColumnType("int");
 
                     b.HasKey("UserId", "InterestId");
 
                     b.HasIndex("InterestId");
 
-                    b.ToTable("UserInterestModel");
+                    b.ToTable("UserInterests");
                 });
 
             modelBuilder.Entity("Fora.Shared.UserModel", b =>
@@ -194,9 +242,7 @@ namespace Fora.Server.Migrations
                 {
                     b.HasOne("Fora.Shared.ThreadModel", "Thread")
                         .WithMany("Messages")
-                        .HasForeignKey("ThreadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ThreadId");
 
                     b.HasOne("Fora.Shared.UserModel", "User")
                         .WithMany("Messages")
@@ -212,9 +258,7 @@ namespace Fora.Server.Migrations
                 {
                     b.HasOne("Fora.Shared.InterestModel", "Interest")
                         .WithMany("Threads")
-                        .HasForeignKey("InterestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InterestId");
 
                     b.HasOne("Fora.Shared.UserModel", "User")
                         .WithMany("Threads")
