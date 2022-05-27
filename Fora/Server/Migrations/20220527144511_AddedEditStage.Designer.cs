@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fora.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220525193017_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220527144511_AddedEditStage")]
+    partial class AddedEditStage
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -99,6 +99,9 @@ namespace Fora.Server.Migrations
                     b.Property<string>("Date")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EditStage")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Edited")
                         .HasColumnType("bit");

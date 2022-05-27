@@ -86,39 +86,33 @@ namespace Fora.Server.Controllers
         }
 
         [HttpPut("updatemessage")]
-        public async Task<ActionResult> PutMessageAsync([FromBody] MessageModel message)
+        public async Task<ActionResult> PutMessageAsync([FromBody] MessageDto message)
         {
-            _dbContext.Messages.Update(message);
-            var result = await _dbContext.SaveChangesAsync();
-            return result > 0 ? Ok() : BadRequest();
+            var dbMessage = await _dbContext.Messages.FindAsync(message.MessageId);
+            if (dbMessage != null)
+            {
+                dbMessage.Message = message.Message;
+                dbMessage.Edited = true;
+                _dbContext.Messages.Update(dbMessage);
+                await _dbContext.SaveChangesAsync();
+                return Ok();
+            }
+            return BadRequest();
         }
 
         //POST a new message
-        [HttpPost("deletemessage")]
-        public async Task<ActionResult<string>> DeleteMessage([FromBody] int messageDelId, [FromQuery] string token)
+        [HttpPut("deletemarkmessage")]
+        public async Task<ActionResult> MarkAsDeletedMessageAsync([FromBody] MessageDto message)
         {
-            Console.WriteLine("DeleteMessage() : Controller");
-
-            MessageModel Message = new();
-
-            var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
-
-            if (identityUser != null)
+            var dbMessage = await _dbContext.Messages.FindAsync(message.MessageId);
+            if (dbMessage != null)
             {
-                var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
-
-                Message = _dbContext.Messages.FirstOrDefault(m => m.Id == messageDelId);
-
-                Message.Message = null;
-                
-
-                _dbContext.Messages.Update(Message);
+                dbMessage.Deleted = true;
+                _dbContext.Messages.Update(dbMessage);
                 await _dbContext.SaveChangesAsync();
-
                 return Ok();
             }
-
-            return BadRequest("Could not create message");
+            return BadRequest();
         }
 
     }
