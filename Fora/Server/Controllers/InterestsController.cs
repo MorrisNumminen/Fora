@@ -72,19 +72,12 @@ namespace Fora.Server.Controllers
         [HttpPost("createinterest")]
         public async Task<ActionResult<string>> CreateNewInterest([FromBody] InterestModel interestToCreate, [FromQuery] string token)
         {
-            
-
-            InterestModel newInterest = new();
-            newInterest.Name = interestToCreate.Name;
-
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             
-
             if (identityUser != null)
             {
                 var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
-
-                // interestToCreate.User = user;
+                interestToCreate.UserId = user.Id;
 
                 _dbContext.Interests.Add(interestToCreate);
                 await _dbContext.SaveChangesAsync();

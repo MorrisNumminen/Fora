@@ -24,34 +24,33 @@
 <h5>@loadingMessage</h5>
 <ul>
     
-@foreach (var interest in interests)
-{
+    @foreach (var interest in interests)
+    {
     
-    <li><em>@interest.Name </em><button onclick="@(() => AddInterest(interest.Id))" 
-        class="btn btn-outline-success"> Add To Favorites </button></li>
-
-        @*HÄR EFRAIM *@
-            @*if(CurrentUser.UserName == interest.User.Username)
-                    {                       
-                        <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
-                    }  *@      
-}
+        <li><em>@interest.Name </em>
+            <button class="btn btn-outline-success" onclick="@(() => AddInterest(interest.Id))"> Add To Favorites </button>
+        </li>
+            if(CurrentUser.Id != Convert.ToString(interest.UserId))
+            {                       
+                <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
+            }        
+    }
 </ul>
 </div>
 
 
 <div class="col-3">
 
-   @* <h4>My Threads</h4>
+    <h4>My Threads</h4>
         <ul>
             @foreach(var thread in userThreads)
             {
-                    if(CurrentUser.Username == thread.User.Username)
+                    if(CurrentUser.Id != Convert.ToString(thread.UserId))
                     {
-                        <li>@thread.Name </li>
+                        <li><a href="thread/@thread.Id">@thread.Name</a></li>
                     }                
             }
-        </ul>*@
+        </ul>
 
 </div>
 @*Favorite Lista*@
@@ -74,7 +73,7 @@
 </div>
 
 <h2> Create a new interest</h2>
-<EditForm Model="@Interest" OnSubmit="CreateNewInterest">
+<EditForm Model="@Interest" OnValidSubmit="CreateNewInterest">
     <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
     <button type="submit">Create</button>
 </EditForm>
@@ -196,7 +195,6 @@
     {
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
-
         // Skickar token tillsammans med Interest objekt
         await InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
 

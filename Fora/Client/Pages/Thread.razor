@@ -39,12 +39,12 @@ body {
             <div class="p-0">
                 <h4><b>@MessageObj.User.Username</b></h4>
                 <p>
-                    @if (loginStatus.IsBanned)
+                    @if (MessageObj.User.Banned)
                     {
                         <small class="text-info">[Banned] </small>
 
                     }
-                    @if (loginStatus.IsDeleted)
+                    @if (MessageObj.User.Deleted)
                     {
                         <small class="text-info">[User Deleted] </small>
                     }
