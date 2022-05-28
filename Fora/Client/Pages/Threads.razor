@@ -6,6 +6,7 @@
 @inject IThreadManager ThreadManager;
 @inject IUserManager UserManager;
 @inject ILocalStorageService LocalStorage;
+@inject IInterestManager InterestManager;
 @page "/threads"
 
 
@@ -33,37 +34,51 @@ body {
 <h3>Threads</h3>
 
 <h4>Start A Topic</h4>
+
+<div class="card">
+        <div class="card-header">
+            <button  class="btn btn-outline-info" @onclick="ToggleCreateThread">Create Thread</button>
+        </div>
+    </div>
+@if (showCreateThread)
+{
+
 <EditForm Model="@Thread" OnSubmit="CreateNewThread">
+
+<InputSelect @bind-Value="@Interest.Name">
+    
+    <option value="Select" selected disabled>Select Interest</option>
+            @foreach(var interest in allInterest)
+            {
+                <option value="@interest.Name"> @interest.Name </option>
+            }            
+</InputSelect>
+
     <InputText @bind-Value="Thread.Name" type="text" placeholder="Title for thread"></InputText>
     <button type="submit">Start topic!</button>
 </EditForm>
+}
 
 @foreach(var thread in ThreadsList)
     {
-        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-        //<a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <div>
+        @*<a> @Interest.Name</a>*@
+        @if(CurrentUser.UserName == thread.User.Username)
+        {
+            
+            @if(loginStatus != null && loginStatus.IsBanned)
+            {
+            <a style="color: orange" >[Banned User]</a>
+            }
 
+        }
+        
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>        
+        </div>
         <br/>
     }
 
-@*
-@if(SearchList.Count() == 0)
-{
-    foreach(var thread in ThreadsList)
-    {
-        <a href="thread">@thread.Name</a>
-        <br/>
-    }
-}
-else if (SearchList.Count() > 0)
-{
-    foreach(var searchThread in SearchList)
-    {
-        <a href="thread">@searchThread</a>
-        <br/>
-    }
-}
-*@
+
 
 @code {
     //hämta ut alla namn(strings) på threads från den riktiga listan och spara det i en ny lista
@@ -71,7 +86,8 @@ else if (SearchList.Count() > 0)
 
     //placeholder List
 
-    public InterestModel Intrest { get; set; } = new();
+    public InterestModel Interest { get; set; } = new();
+    public List<InterestModel>? allInterest = new();
 
     private string SearchTerm { get; set; } = string.Empty;
 
@@ -83,24 +99,46 @@ else if (SearchList.Count() > 0)
 
     public List<string> SearchList = new();
 
+    private bool showCreateThread;
+    public ApplicationUser CurrentUser { get; set; }
+    private string? interestName;
+    private LoginDto? loginStatus;
+    private string? token;
+
     protected override async Task OnInitializedAsync()
     {
         //    return base.OnInitializedAsync();
         ThreadsList = await ThreadManager.GetThreads();
         //ThreadsList.Sort();
+        token = await LocalStorage.GetItemAsStringAsync("token");
+
+        CurrentUser = await UserManager.GetAsync(token);
+        loginStatus = await UserManager.CheckUserLogin(token);
+
+        allInterest = await InterestManager.GetInterests();
+    }
+
+    private void ToggleCreateThread()
+    {
+        if (showCreateThread == false)
+        {
+            showCreateThread = true;
+        }
+        else
+        {
+            showCreateThread = false;
+        }
     }
 
 
-
-
-        public async Task CreateNewThread()
+    public async Task CreateNewThread()
     {
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Interest objekt
         await ThreadManager.CreateNewThread(Thread, tokenFromLocalStorage);
-
+        showCreateThread = false;
         ThreadsList = await ThreadManager.GetThreads();
         //ThreadsList.Sort();
 
