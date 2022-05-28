@@ -43,40 +43,41 @@ body {
 @if (showCreateThread)
 {
 
-<EditForm Model="@Thread" OnSubmit="CreateNewThread">
-
-<InputSelect @bind-Value="@Interest.Name">
-    
-    <option value="Select" selected disabled>Select Interest</option>
-            @foreach(var interest in allInterest)
-            {
-                <option value="@interest.Name"> @interest.Name </option>
-            }            
-</InputSelect>
-
+<EditForm Model="@Thread" OnValidSubmit="CreateNewThread">
+    <InputSelect @bind-Value="@Interest.Name">
+        <option value="Select" selected disabled>Select Interest</option>
+                @foreach(var interest in allInterest)
+                {
+                    <option value="@interest.Name"> @interest.Name </option>
+                }            
+    </InputSelect>
     <InputText @bind-Value="Thread.Name" type="text" placeholder="Title for thread"></InputText>
     <button type="submit">Start topic!</button>
 </EditForm>
 }
 
 @foreach(var thread in ThreadsList)
-    {
-        <div>
+{
+    <div>
         @*<a> @Interest.Name</a>*@
-        @if(CurrentUser.UserName == thread.User.Username)
+        @if(thread.User != null)
         {
-            
-            @if(loginStatus != null && loginStatus.IsBanned)
+            @if(CurrentUser.UserName == thread.User.Username)
             {
-            <a style="color: orange" >[Banned User]</a>
+                @if(thread.User.Banned)
+                {
+                    <a style="color: orange" >[Banned User] </a>
+                }
+                @if (thread.User.Deleted)
+                {
+                    <a style="color: orange" >[Deleted User] </a>
+                }
             }
-
         }
-        
         <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>        
-        </div>
-        <br/>
-    }
+    </div>
+    <br/>
+}
 
 
 
@@ -101,6 +102,7 @@ body {
 
     private bool showCreateThread;
     public ApplicationUser CurrentUser { get; set; }
+    public UserModel ThreadCreator { get; set; }
     private string? interestName;
     private LoginDto? loginStatus;
     private string? token;
@@ -109,6 +111,10 @@ body {
     {
         //    return base.OnInitializedAsync();
         ThreadsList = await ThreadManager.GetThreads();
+        foreach(ThreadModel thread in ThreadsList)
+        {
+            
+        }
         //ThreadsList.Sort();
         token = await LocalStorage.GetItemAsStringAsync("token");
 
@@ -130,7 +136,6 @@ body {
         }
     }
 
-
     public async Task CreateNewThread()
     {
         // Get token
@@ -141,8 +146,6 @@ body {
         showCreateThread = false;
         ThreadsList = await ThreadManager.GetThreads();
         //ThreadsList.Sort();
-
-
 
     }
 
