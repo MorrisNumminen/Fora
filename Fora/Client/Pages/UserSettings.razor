@@ -24,15 +24,17 @@
 <h5>@loadingMessage</h5>
 <ul>
     
-@foreach (var element in interests)
+@foreach (var interest in interests)
 {
     
-    <li><em>@element.Name </em><button onclick="@(() => AddInterest(element.Id))" 
+    <li><em>@interest.Name </em><button onclick="@(() => AddInterest(interest.Id))" 
         class="btn btn-outline-success"> Add To Favorites </button></li>
-                   @* if(CurrentUser.Username == element.User.Username)
-                    {
-                        <a onclick="@(() => RemoveUserInterest(element.Id))class="btn btn-danger">Delete Interest</a>
-                    }*@
+
+        @*HÄR EFRAIM *@
+            @*if(CurrentUser.UserName == interest.User.Username)
+                    {                       
+                        <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
+                    }  *@      
 }
 </ul>
 </div>
@@ -62,6 +64,7 @@
                 
                 <li><em>@favo.Name </em><button onclick="@(() => RemoveUserInterest(favo.Id))" 
                 class="btn btn-outline-danger"> Remove </button></li>
+
             }
         </ul>
 
@@ -126,7 +129,7 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
-    // public ApplicationUser CurrentUser { get; set; }
+    public ApplicationUser CurrentUser { get; set; }
     public List<InterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
     public List<ThreadModel> userThreads = new();
@@ -147,6 +150,8 @@
     protected override async Task OnInitializedAsync()
     {
         token = await LocalStorage.GetItemAsStringAsync("token");
+
+        CurrentUser = await UserManager.GetAsync(token);
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
