@@ -4,7 +4,7 @@
 
 namespace Fora.Server.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class AddedEditStage : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -102,6 +102,7 @@ namespace Fora.Server.Migrations
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Edited = table.Column<bool>(type: "bit", nullable: false),
+                    EditStage = table.Column<bool>(type: "bit", nullable: false),
                     ThreadId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },

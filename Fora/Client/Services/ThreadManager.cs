@@ -50,17 +50,14 @@ namespace Fora.Client.Services
 
         }
         
-        public async Task DeleteMessage(int messageDelId, string token)
+        public async Task MarkAsDeletedMessageAsync(MessageDto message)
         {
-            // Lägg till ett message i db
-            Console.WriteLine("DeleteMessage() : 2");
-            await _httpClient.PostAsJsonAsync<int>($"api/Threads/deletemessage?token={token}", messageDelId);
+            await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/deletemarkmessage", message);
         }
 
-        public async Task PutMessageAsync(MessageModel message)
+        public async Task PutMessageAsync(MessageDto message)
         {
-            
-           var response = await _httpClient.PutAsJsonAsync<MessageModel>($"api/Threads/updatemessage", message);
+            await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/updatemessage", message);
         }
     }
 }
