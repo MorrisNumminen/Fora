@@ -24,7 +24,7 @@ namespace Fora.Server.Controllers
         public async Task<ActionResult<List<InterestModel>>> GetAsync()
         {
             List<InterestModel> list = new();
-            list = await _dbContext.Interests.ToListAsync();
+            list = await _dbContext.Interests.Include(x => x.User).ToListAsync();
             return Ok(list);
         }
 
@@ -39,8 +39,8 @@ namespace Fora.Server.Controllers
             {
                 UserInterestModel userInterest = new UserInterestModel()
                 {
-                    User = dbUser,
-                    Interest = dbInterest
+                    UserId = dbUser.Id,
+                    InterestId = dbInterest.Id
                 };
 
                 _dbContext.UserInterests.Add(userInterest);
@@ -49,7 +49,7 @@ namespace Fora.Server.Controllers
                 return Ok();
             }
 
-            return BadRequest();
+            return Conflict();
         }
 
         [HttpGet("UserInterests")]
@@ -60,7 +60,7 @@ namespace Fora.Server.Controllers
 
             if(user != null && identityUser != null)
             {
-                var userInterests = _dbContext.Interests.Where(i => i.UserInterests.Any(ui => ui.UserId == user.Id)).ToList();
+                var userInterests = _dbContext.UserInterests.Where(ui => ui.UserId == user.Id).ToList();
 
                 return Ok(userInterests);
             }

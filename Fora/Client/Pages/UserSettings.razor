@@ -28,9 +28,9 @@
     {
     
         <li><em>@interest.Name </em>
-            <button class="btn btn-outline-success" onclick="@(() => AddInterest(interest.Id))"> Add To Favorites </button>
+            <button class="btn btn-outline-success" @onclick="() => AddInterest(interest.Id)"> Add To Favorites </button>
         </li>
-            if(CurrentUser.Id == Convert.ToString(interest.UserId))
+            if(interest != null && interest.User.Username == authUser.UserName)
             {                       
                 <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
             }        
@@ -45,7 +45,7 @@
         <ul>
             @foreach(var thread in userThreads)
             {
-                    if(CurrentUser.Id != Convert.ToString(thread.UserId))
+                    if(thread != null)
                     {
                         <li><a href="thread/@thread.Id">@thread.Name</a></li>
                     }                
@@ -128,7 +128,7 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
-    public ApplicationUser CurrentUser { get; set; }
+    public ApplicationUser authUser { get; set; }
     public List<InterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
     public List<ThreadModel> userThreads = new();
@@ -150,16 +150,16 @@
     {
         token = await LocalStorage.GetItemAsStringAsync("token");
 
-        CurrentUser = await UserManager.GetAsync(token);
+        authUser = await UserManager.GetAsync(token);
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
         userInterests = await InterestManager.GetUserInterests(token);
 
         userThreads = await ThreadManager.GetThreads();
-
+        userThreads = userThreads.Where(x => x.User.Username == authUser.UserName).ToList();
         loadingMessage = "Loading interests...";
-        interests = await InterestManager.GetInterests();
+        interests = await InterestManager.GetInterests();       
 
         loadingMessage = "Finished loading!";
     }
