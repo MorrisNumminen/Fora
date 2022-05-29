@@ -17,12 +17,14 @@ body {
 
 <h3>@CurrentThread.Name</h3>
 
-<div>
+
+
     <EditForm Model="@NewMessage" OnValidSubmit="CreateMessage">
         <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
         <button type="submit">Post Message</button>
     </EditForm>
-</div>
+
+
 
 @foreach( var MessageObj in Messages)
 {
@@ -112,8 +114,7 @@ body {
     public string TestMessage { get; set; } = String.Empty;
     public int EditValue { get; set; }
     public string Color { get; set; }
-
-    //public MsgDto NewMessage { get; set; } = new();
+    
 
     public List<MessageModel> Messages = new();
 
@@ -131,7 +132,7 @@ body {
         Messages.Reverse();
     }
 
-
+  
 
     public async Task CreateMessage()
     {
