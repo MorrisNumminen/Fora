@@ -34,9 +34,6 @@ namespace Fora.Server.Controllers
         [HttpPost("createthread")]
         public async Task<ActionResult<string>> CreateNewThread([FromBody] ThreadModel threadToCreate, [FromQuery] string token)
         {
-            ThreadModel newThread = new();
-            newThread.Name = threadToCreate.Name;
-
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
 
             if (identityUser != null)
@@ -49,7 +46,6 @@ namespace Fora.Server.Controllers
 
                 return Ok();
             }
-
             return BadRequest("Could not create thread");
         }
 

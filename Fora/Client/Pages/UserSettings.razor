@@ -30,7 +30,7 @@
         <li><em>@interest.Name </em>
             <button class="btn btn-outline-success" onclick="@(() => AddInterest(interest.Id))"> Add To Favorites </button>
         </li>
-            if(CurrentUser.Id != Convert.ToString(interest.UserId))
+            if(CurrentUser.Id == Convert.ToString(interest.UserId))
             {                       
                 <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
             }        
