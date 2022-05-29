@@ -18,19 +18,35 @@ body {
 }
 </style>
 
-@*
-<form onsubmit="@OnSearch">
-    <label for="searchStr"> Search: </label>
-    <input type="text" id="searchStr"/>
-    <input type="submit" />
-</form>
 
-<EditForm Model=@Thread OnSubmit="@(OnSearch)">
-    <label for="search">Search</label>
-    <InputText PlaceHolder="CaseSensetive!" @bind-Value=(SearchTerm)></InputText>
-    <input type="submit" />
+<EditForm Model="@SearchDto" OnValidSubmit="GetSearchList">
+    @*FORM VALIDATION*@
+    <DataAnnotationsValidator />
+
+    @*Search*@
+    <div class="my-3">
+        <InputText @bind-Value="@SearchDto.SearchWord" placeholder="Search:"></InputText>
+        <button class="btn-info" type="submit" @onclick="@GetSearchList">Search</button>
+    </div>
+    
+    @*SEARCH METHOD*@
+    <InputSelect @bind-Value="@SearchDto.SearchMethod">
+        <option value="Select" selected disabled="disabled">(Sorting Method)</option>
+        <option value="thread">Thread Title</option>
+        <option value="interest">Interest</option>
+    </InputSelect>
+
+    @*SORT*@
+    <InputSelect @bind-Value="@SearchDto.SortMethod">
+        <option value="Select" selected disabled="disabled">(Sorting Method)</option>
+        <option value="az">A-Z</option>
+        <option value="za">Z-A</option>
+    </InputSelect>
+    <ValidationMessage For="@(() => SearchDto.SortMethod)" />
+   
 </EditForm>
-*@
+
+SearchMethod
 <h3>Threads</h3>
 
 <h4>Start A Topic</h4>
@@ -61,7 +77,7 @@ body {
 
 @foreach(var thread in ThreadsList)
 {
-   // Console.WriteLine(NumberOfMsgsList[counter]);
+    //Console.WriteLine(NumberOfMsgsList[counter]);
     @if(thread.User != null)
         {
             @if(CurrentUser.UserName == thread.User.Username)
@@ -94,11 +110,17 @@ body {
 
 
 @code {
-    //hämta ut alla namn(strings) på threads från den riktiga listan och spara det i en ny lista
-    //sortera den listan och loopa igenom den för att visa namnen med html
+
+    public List<ThreadModel> SearchList { get; set; }
+    public string SearchWord { get; set; } = String.Empty;
+    public SearchDto SearchDto { get; set; } = new SearchDto
+    {
+        SearchWord = String.Empty,
+        SearchMethod = "thread",
+        SortMethod = "az"
+    };
 
     //placeholder List
-
     public int PlaceHolderID { get; set; }
     public int counter { get; set; }
     public int? NumberOfMsgs { get; set; }
@@ -107,15 +129,11 @@ body {
     public InterestModel Interest { get; set; } = new();
     public List<InterestModel>? allInterest = new();
 
-    private string SearchTerm { get; set; } = string.Empty;
-
     public List<ThreadModel> ThreadsList = new();
 
     string tokenFromLocalStorage = "Före token";
 
     public ThreadModel Thread { get; set; } = new();
-
-    public List<string> SearchList = new();
 
     private bool showCreateThread;
     public ApplicationUser CurrentUser { get; set; }
@@ -138,6 +156,44 @@ body {
         allInterest = await InterestManager.GetInterests();
         await MsgCounter();
     }
+
+    public async Task GetSearchList()
+    {
+        List<ThreadModel>? tempList = null;
+
+        var response = await ThreadManager.GetThreads();
+        tempList = response.ToList();
+
+        if (tempList != null)
+        {
+            //Search by thread title
+            if(SearchDto.SearchMethod == "thread")
+            {
+            SearchList = tempList.Where(a => a.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
+            }
+            //Search by interest name
+            else if(SearchDto.SearchMethod == "interest")
+            {
+            SearchList = tempList.Where(a => a.Interest.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
+            }
+
+        }
+
+
+        switch (SearchDto.SortMethod)
+        {
+            case "az":
+                SearchList = SearchList.OrderBy(x => x.Name).ToList();
+                break;
+            case "za":
+                SearchList = SearchList.OrderByDescending(x => x.Name).ToList();
+                break;
+        }
+
+        ThreadsList = SearchList;
+        StateHasChanged();
+    }
+
 
     private void ToggleCreateThread()
     {
