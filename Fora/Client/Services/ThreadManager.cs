@@ -25,18 +25,9 @@ namespace Fora.Client.Services
             return null;
         }
 
-        public async Task<List<MessageModel?>> GetThreadMessages(int threadId)
+        public async Task<List<MessageModel>> GetThreadMessages(int threadId)
         {
-
-            HttpResponseMessage response = await _httpClient.GetAsync($"api/Threads/getthreadmessages/{threadId}");
-            var test = response.Content.ReadAsStream();
-            List<MessageModel?> message = null;                                     
-            if (response.IsSuccessStatusCode)
-            {
-                message = await response.Content.ReadAsAsync<List<MessageModel?>>();
-            }
-            return message;
-          
+            return await _httpClient.GetFromJsonAsync<List<MessageModel>>($"api/Threads/getthreadmessages/{threadId}");
         }
 
         public async Task<string> CreateNewMessage(MessageModel messageToCreate, string token)
@@ -48,15 +39,15 @@ namespace Fora.Client.Services
             return null;
 
         }
-        
-        public async Task MarkAsDeletedMessageAsync(MessageDto message)
+
+        public async Task DeleteMessage(int messageDelId, string token)
         {
-            await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/deletemarkmessage", message);
+            // Lägg till ett message i db
+            Console.WriteLine("DeleteMessage() : 2");
+            await _httpClient.PostAsJsonAsync<int>($"api/Threads/deletemessage?token={token}", messageDelId);
         }
 
-        public async Task PutMessageAsync(MessageDto message)
-        {
-            await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/updatemessage", message);
-        }
+
+
     }
 }

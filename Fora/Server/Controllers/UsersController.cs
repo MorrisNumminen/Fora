@@ -24,12 +24,18 @@ namespace Fora.Server.Controllers
            
         }
 
-        // GET api/<UsersController>/5
-        [HttpGet("{token}")]
-        public async Task<ApplicationUser> GetAsync(string token)
+        // GET: api/<UsersController>
+        [HttpGet]
+        public IEnumerable<string> Get()
         {
-            var currentUser = _authContext.Users.FirstOrDefault(u => u.Token == token);
-            return currentUser;
+            return new string[] { "value1", "value2" };
+        }
+
+        // GET api/<UsersController>/5
+        [HttpGet("{id}")]
+        public string Get(int id)
+        {
+            return "value";
         }
 
         // POST api/<UsersController>

@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace Fora.Server.Migrations.AppDb
+namespace Fora.Server.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,7 +29,7 @@ namespace Fora.Server.Migrations.AppDb
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -50,7 +50,7 @@ namespace Fora.Server.Migrations.AppDb
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InterestId = table.Column<int>(type: "int", nullable: true),
+                    InterestId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -60,7 +60,8 @@ namespace Fora.Server.Migrations.AppDb
                         name: "FK_Threads_Interests_InterestId",
                         column: x => x.InterestId,
                         principalTable: "Interests",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Threads_Users_UserId",
                         column: x => x.UserId,
@@ -70,7 +71,7 @@ namespace Fora.Server.Migrations.AppDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserInterests",
+                name: "UserInterestModel",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
@@ -78,15 +79,15 @@ namespace Fora.Server.Migrations.AppDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserInterests", x => new { x.UserId, x.InterestId });
+                    table.PrimaryKey("PK_UserInterestModel", x => new { x.UserId, x.InterestId });
                     table.ForeignKey(
-                        name: "FK_UserInterests_Interests_InterestId",
+                        name: "FK_UserInterestModel_Interests_InterestId",
                         column: x => x.InterestId,
                         principalTable: "Interests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserInterests_Users_UserId",
+                        name: "FK_UserInterestModel_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -99,12 +100,8 @@ namespace Fora.Server.Migrations.AppDb
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Edited = table.Column<bool>(type: "bit", nullable: false),
-                    EditStage = table.Column<bool>(type: "bit", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    ThreadId = table.Column<int>(type: "int", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ThreadId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -114,43 +111,14 @@ namespace Fora.Server.Migrations.AppDb
                         name: "FK_Messages_Threads_ThreadId",
                         column: x => x.ThreadId,
                         principalTable: "Threads",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Messages_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.InsertData(
-                table: "Interests",
-                columns: new[] { "Id", "Name", "UserId" },
-                values: new object[,]
-                {
-                    { 1, "Games", null },
-                    { 2, "Sports", null },
-                    { 3, "Politics", null },
-                    { 4, "Religion", null },
-                    { 5, "Design", null },
-                    { 6, "Garden", null },
-                    { 7, "Technology", null },
-                    { 8, "Pets", null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Threads",
-                columns: new[] { "Id", "InterestId", "Name", "UserId" },
-                values: new object[,]
-                {
-                    { 1, null, "Introduce yourself!", null },
-                    { 2, null, "DS3 Cheat codes plz", null },
-                    { 3, null, "How to get rich in sims 66", null },
-                    { 4, null, "Why is my game lagging???", null },
-                    { 5, null, "How to git gud", null },
-                    { 6, null, "New Lego City Speedrun Record!", null },
-                    { 7, null, "GTA hydra abuse", null },
-                    { 8, null, "Tetris laggy. What is my bottleneck??? help", null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -179,8 +147,8 @@ namespace Fora.Server.Migrations.AppDb
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserInterests_InterestId",
-                table: "UserInterests",
+                name: "IX_UserInterestModel_InterestId",
+                table: "UserInterestModel",
                 column: "InterestId");
         }
 
@@ -190,7 +158,7 @@ namespace Fora.Server.Migrations.AppDb
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "UserInterests");
+                name: "UserInterestModel");
 
             migrationBuilder.DropTable(
                 name: "Threads");

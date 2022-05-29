@@ -19,14 +19,7 @@ namespace Fora.Client.Services
             _navigationManager = navigationManager;
         }
 
-       public async Task<ApplicationUser> GetAsync(string token)
-        {
-            var response = await _http.GetAsync($"api/users/{token}");
-            var result = await response.Content.ReadAsStringAsync();
-            var user = JsonConvert.DeserializeObject<ApplicationUser>(result);
-
-            return user;
-        }
+       
 
         public async Task<string> RegisterUser(UserDto userToRegister)
         {

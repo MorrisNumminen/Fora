@@ -47,7 +47,7 @@
 
     public async Task ChangePassword()
     {
-      
+        // Run change password method in UserManager
 
         string token = await LocalStorage.GetItemAsStringAsync("token");
 
@@ -58,9 +58,19 @@
     }
 
     protected override async Task OnInitializedAsync()
-    {        
+    {
+        
+        // 4. Rendera endast delar av sidan beroende på om vi är inloggade eller inte (boolen)
+
+        // 1. Hämta token från Local Storage
+
         token = await LocalStorage.GetItemAsStringAsync("token");
-       
-        loginStatus = await UserManager.CheckUserLogin(token);             
+
+        // 2. Skicka token till API för att kolla om vi är inloggade
+
+        loginStatus = await UserManager.CheckUserLogin(token);
+        
+        // 3. Spara inloggningsstatus i en bool (inloggad/inte inloggad)
+      
     }
 }

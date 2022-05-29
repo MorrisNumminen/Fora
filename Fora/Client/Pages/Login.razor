@@ -18,13 +18,11 @@ body {
 
 <h3>Login</h3>
 
-<EditForm Model="@User" OnValidSubmit="LogInUser">
+<EditForm Model="@User" OnSubmit="LogInUser">
     <InputText @bind-Value="@User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="@User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Log In</button>
 </EditForm>
-
-
 
 @code {
     public UserDto User { get; set; } = new();

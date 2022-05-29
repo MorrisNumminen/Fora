@@ -5,7 +5,6 @@
 @using Blazored.LocalStorage
 @inject IUserManager UserManager;
 @inject IInterestManager InterestManager;
-@inject IThreadManager ThreadManager;
 @inject ILocalStorageService LocalStorage;
 @inject NavigationManager NavigationManager
 @page "/usersettings"
@@ -17,42 +16,25 @@
 
 
 
-    
+
 <div class="row">
 <div class="col-3">
 <h4>Interests</h4>
 <h5>@loadingMessage</h5>
 <ul>
     
-    @foreach (var interest in interests)
-    {
+@foreach (var element in interests)
+{
     
-        <li><em>@interest.Name </em>
-            <button class="btn btn-outline-success" onclick="@(() => AddInterest(interest.Id))"> Add To Favorites </button>
-        </li>
-            if(CurrentUser.Id == Convert.ToString(interest.UserId))
-            {                       
-                <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
-            }        
-    }
+    <li><em>@element.Name </em><button onclick="@(() => AddInterest(element.Id))" 
+        class="btn btn-outline-success"> Add To Favorites </button></li>
+   
+}
 </ul>
 </div>
 
 
-<div class="col-3">
-
-    <h4>My Threads</h4>
-        <ul>
-            @foreach(var thread in userThreads)
-            {
-                    if(CurrentUser.Id != Convert.ToString(thread.UserId))
-                    {
-                        <li><a href="thread/@thread.Id">@thread.Name</a></li>
-                    }                
-            }
-        </ul>
-
-</div>
+<div class="col-6"></div>
 @*Favorite Lista*@
 
     <div class="col-3">
@@ -63,7 +45,6 @@
                 
                 <li><em>@favo.Name </em><button onclick="@(() => RemoveUserInterest(favo.Id))" 
                 class="btn btn-outline-danger"> Remove </button></li>
-
             }
         </ul>
 
@@ -73,7 +54,7 @@
 </div>
 
 <h2> Create a new interest</h2>
-<EditForm Model="@Interest" OnValidSubmit="CreateNewInterest">
+<EditForm Model="@Interest" OnSubmit="CreateNewInterest">
     <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
     <button type="submit">Create</button>
 </EditForm>
@@ -88,15 +69,14 @@
 <div class="col-2">  
 
     <label>Current password:</label>
-    <InputText type="password" @bind-Value="User.Password"></InputText>
+    <InputText @bind-Value="User.Password"></InputText>
     <br />
         <label>New password:</label>
-    <InputText type="password" @bind-Value="newPassword" />
+    <InputText @bind-Value="newPassword" />
     <br />
     <label>Confirm Password:</label>
-    <InputText type="password" @bind-Value="confirmPassword" />
+    <InputText @bind-Value="confirmPassword" />
     <input type="submit" class="btn-outline-primary" value="Change password" />
-    <a>@Message</a>
 </div>
 </EditForm>
  
@@ -128,13 +108,11 @@
     public List<InterestModel> interests = new();
 
     public InterestModel Interest { get; set; } = new();
-    public ApplicationUser CurrentUser { get; set; }
+
     public List<InterestModel> userInterests = new();
-    public List<ThreadModel> myThreads = new();
-    public List<ThreadModel> userThreads = new();
 
     string? loadingMessage;
-    string? Message;
+
     string tokenFromLocalStorage = "Före token";
 
     public UserDto User { get; set; } = new();
@@ -145,18 +123,17 @@
     private string? confirmPassword;
 
 
-
     protected override async Task OnInitializedAsync()
     {
         token = await LocalStorage.GetItemAsStringAsync("token");
 
-        CurrentUser = await UserManager.GetAsync(token);
+        // 2. Skicka token till API för att kolla om vi är inloggade
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
-        userInterests = await InterestManager.GetUserInterests(token);
 
-        userThreads = await ThreadManager.GetThreads();
+         //This one
+        userInterests = await InterestManager.GetUserInterests(token);                                                                
 
         loadingMessage = "Loading interests...";
         interests = await InterestManager.GetInterests();
@@ -164,7 +141,7 @@
         loadingMessage = "Finished loading!";
     }
 
-
+    
 
     private async Task AddInterest(int id)
     {
@@ -180,8 +157,8 @@
 
     public async Task RemoveUserInterest(int id)
     {
-
-        var ui = interests.FirstOrDefault(ui => ui.Id == id);
+        
+         var ui = interests.FirstOrDefault(ui => ui.Id == id);
 
         if(ui != null)
         {
@@ -195,6 +172,7 @@
     {
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
+
         // Skickar token tillsammans med Interest objekt
         await InterestManager.CreateInterest(Interest, tokenFromLocalStorage);
 
@@ -226,7 +204,7 @@
     }
 
 
-
+    
 
     public async Task ChangePassword()
     {
@@ -237,7 +215,6 @@
         if(newPassword == confirmPassword && token != null)
         {
             await UserManager.ChangePasswordUser(User, newPassword, token);
-            Message = "Password Changed";
         }
     }
 
