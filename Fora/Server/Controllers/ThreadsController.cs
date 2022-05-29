@@ -26,7 +26,7 @@ namespace Fora.Server.Controllers
         public async Task<List<ThreadModel>> GetThreads()
         {
             // Returnera lista med threads
-            return _dbContext.Threads.ToList();
+            return _dbContext.Threads.Include(x => x.Interest).Include(x => x.User).ToList();
         }
 
 

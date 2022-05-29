@@ -9,11 +9,9 @@ namespace Fora.Shared
 {
     public class UserDto
     {
-        [Required]
-        [StringLength(5)]
+        [Required]        
         public string? Username { get; set; }
-        [Required]
-        [StringLength(4)]
+        [Required]       
         public string? Password { get; set; }
     }
 }

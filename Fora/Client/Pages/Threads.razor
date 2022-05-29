@@ -40,25 +40,28 @@ body {
             <button  class="btn btn-outline-info" @onclick="ToggleCreateThread">Create Thread</button>
         </div>
     </div>
-@if (showCreateThread)
+@if(showCreateThread)
 {
 
 <EditForm Model="@Thread" OnValidSubmit="CreateNewThread">
-    <InputSelect @bind-Value="@Interest.Name">
+
+    <InputSelect @bind-Value="@Thread.InterestId">
         <option value="Select" selected disabled>Select Interest</option>
                 @foreach(var interest in allInterest)
                 {
-                    <option value="@interest.Name"> @interest.Name </option>
+                    <option value="@interest.Id"> @interest.Name </option>
                 }            
     </InputSelect>
     <InputText @bind-Value="Thread.Name" type="text" placeholder="Title for thread"></InputText>
     <button type="submit">Start topic!</button>
+
 </EditForm>
+
 }
 
 @foreach(var thread in ThreadsList)
 {
-    Console.WriteLine(NumberOfMsgsList[counter]);
+   // Console.WriteLine(NumberOfMsgsList[counter]);
     @if(thread.User != null)
         {
             @if(CurrentUser.UserName == thread.User.Username)
@@ -77,8 +80,13 @@ body {
         {
             counter = 0;
         }
+    @if(thread.Interest != null)
+    {
+        <a>@thread.Interest.Name</a>
+    }
+
         <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-        <p>Messages: @NumberOfMsgsList[counter]</p>
+       // <p>Messages: @NumberOfMsgsList[counter]</p>
         counter++;
     <br/>
 }
@@ -152,7 +160,7 @@ body {
         await ThreadManager.CreateNewThread(Thread, tokenFromLocalStorage);
         showCreateThread = false;
         ThreadsList = await ThreadManager.GetThreads();
-        //ThreadsList.Sort();
+        
 
     }
 
