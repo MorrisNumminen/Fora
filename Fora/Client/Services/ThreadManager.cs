@@ -20,7 +20,7 @@ namespace Fora.Client.Services
         {
             // Lägg till ett interest i db
 
-            var response = await _httpClient.PostAsJsonAsync($"api/Threads/createthread?token={token}", threadToCreate);
+            await _httpClient.PostAsJsonAsync($"api/Threads/createthread?token={token}", threadToCreate);
 
             return null;
         }
