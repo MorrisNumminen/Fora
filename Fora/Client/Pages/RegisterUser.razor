@@ -13,6 +13,7 @@ body {
 <h3 style="font-family:'Times New Roman', Times, serif;">Register a User</h3>
 
 <EditForm Model="@User" OnValidSubmit="RegUser">
+    <DataAnnotationsValidator/>
     <InputText @bind-Value="User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Register</button>
