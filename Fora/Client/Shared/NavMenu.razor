@@ -86,9 +86,15 @@
     //Visa User Settings i NavBar ifall en användare är inloggad
     protected override async Task OnInitializedAsync()
     {
+
         token = await LocalStorage.GetItemAsStringAsync("token");
 
-        loginStatus = await UserManager.CheckUserLogin(token);
+        if(token != null)
+        {
+            loginStatus = await UserManager.CheckUserLogin(token);
+        }
+
+        
         StateHasChanged();
     }
 }
