@@ -3,7 +3,6 @@
 @using Fora.Client.Services
 @using Fora.Shared
 @using Blazored.LocalStorage
-@using System.Linq
 @inject IInterestManager IntrestsManager;
 @inject IThreadManager ThreadManager;
 @inject IUserManager UserManager;
@@ -19,13 +18,12 @@ body {
 }
 </style>
 
-<EditForm Model=SearchTerm OnValidSubmit=@HandleValidSubmit> 
+<EditForm Model=SearchTerm OnValidSubmit=@HandleValidSubmit>
     <label for="SearchTerm">Search</label>
     <InputText @bind-Value="SearchTerm"></InputText>
     <input type="submit"/>
 </EditForm>
-<p>To get all threads, enter nothing and press submit</p>
-<p>To sort, Search for 'Sort.All'(CaseSenitive)</p>
+<p>To get all threads, enter nothing in the feild and press submit</p>
 
 <h3>Threads</h3>
 <h4>Start A Topic</h4>
@@ -35,13 +33,13 @@ body {
 </EditForm>
 <br />
 
-@if(SearchList.Count() == 0 && NumberOfMsgsList.Count() != 0) @*Denn if-sats skriver ut alla trådar och hur många medelanden den har i den ordningen som de seedades i databasen. Denna använda när man vill se alla trådarna*@
+@if(SearchList.Count() == 0 && NumberOfMsgsList.Count() != 0)
 {
     @foreach(var thread in ThreadsList)
     {
-    <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-    <p>Messages: @NumberOfMsgsList[counter]</p>
-        if (counter < NumberOfMsgsList.Count() && counter + 1 != NumberOfMsgsList.Count()) @*Felhantering så inte counter blir större än NumberOfMsgsList*@
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <p>Messages: @NumberOfMsgsList[counter]</p>
+        if (counter < NumberOfMsgsList.Count() && counter + 1 != NumberOfMsgsList.Count())
         {
             counter++; 
         }
@@ -52,14 +50,13 @@ body {
 
     }
 }
-else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna else if satsen renderar up sök resultatet. Fungerar på samma sätt som if-satsen ovan. *@
+else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0)
 {
     foreach(var thread in SearchList)
     {
-    <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-    <p>Messages: @NumberOfSearchMsgsList[searchCounter]</p>
- @*       Console.WriteLine(NumberOfSearchMsgsList[searchCounter]);*@
-        if (searchCounter < NumberOfSearchMsgsList.Count() && searchCounter + 1 != NumberOfSearchMsgsList.Count()) @*Felhantering så inte counter blir större än NumberOfMsgsList*@
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <p>Messages: @NumberOfSearchMsgsList[searchCounter]</p>
+        if (searchCounter < NumberOfSearchMsgsList.Count() && searchCounter + 1 != NumberOfSearchMsgsList.Count())
         {
             searchCounter++;
         }
@@ -69,7 +66,7 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
         }
 
     }
-
+    SearchList.Clear();
 }
 
 @code {
@@ -79,44 +76,39 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
     public Threads()
     {
     }
-    public bool isFormValid { get; set; } // säger om en form är valid eller inte
+    public bool isFormvalid { get; set; }
+    public int counter { get; set; }
+    public int searchCounter { get; set; }
+    public int PlaceHolderID { get; set; }
+    public int SearchPlaceHolderId { get; set; }
 
-    public int counter { get; set; } // Används för att den första if-satsen högstupp så rätt medelande hamnar med rätt tråd
-    public int searchCounter { get; set; } //Fyller samma funktion som counter men tillhör sökresultatet
+    public int? NumberOfMsgs { get; set; }
+    public List<int?> NumberOfMsgsList = new();
+    public int? NumberOfSearchMsgs { get; set; }
+    public List<int?> NumberOfSearchMsgsList = new();
 
-    public int PlaceHolderID { get; set; } //Är en placeHolder för ThreadID, används till när man vill visa alla trådar
-    public int SearchPlaceHolderId { get; set; } //Är en placeHolder för ThreadID, används till när man vill visa sökta trådar
+    public string SearchTerm { get; set; } = string.Empty;
+    public List<ThreadModel> SearchList = new();
 
-    public int? NumberOfMsgs { get; set; } // Säger hur många medelanden det finns i en tråd
-    public List<int?> NumberOfMsgsList = new(); //Lista på hur många medelanden som finns i varje tråd. Index 0 tillhör Tråden med ID 1, Index 1 tillhör Tråden med ID 2 osv.
+    public List<ThreadModel> ThreadsList = new();
+    public ThreadModel Thread = new();
 
-    public int? NumberOfSearchMsgs { get; set; } // Säger hur många medelanden det finns i en tråd man har sökt på.
-    public List<int?> NumberOfSearchMsgsList = new(); // Lista med hur många medelanden det finns i trådarna man har sökt på. Korrelerar med listan med alla sökta trådar(SearchList). Index 1 i båda listorna hörsamman osv
-
-    public string SearchTerm { get; set; } = string.Empty; // sök strängen som man skrev in i sökformuläret
-    public List<ThreadModel> SearchList = new(); // Lista med alla trådar man sökt på
-
-    public List<ThreadModel> ThreadsList = new(); // Lista med alla trådar
-    public ThreadModel Thread = new(); //Ny instans av tråd
-
-    string tokenFromLocalStorage = "Före token"; 
-
+    string tokenFromLocalStorage = "Före token";
 
 
     protected override async Task OnInitializedAsync()
     {
         counter = 0;
         searchCounter = 0;
-        PlaceHolderID = 1; // Är placeHolder för ThreadID, Börjar på 1 för att det inte finns någon tråd med ID 0
-        ThreadsList = await ThreadManager.GetThreads(); //hämtar listan med alla threads
+        PlaceHolderID = 1;
+        ThreadsList = await ThreadManager.GetThreads();
         await MsgCounter();
     }
 
-
-    public async void FormSubmitted(EditContext editContext) // validerar formuläret för att ska en ny tråd
+    public async void FormSubmitted(EditContext editContext) // validates the create new thread form
     {
-        isFormValid = editContext.Validate();
-        if (isFormValid)
+        isFormvalid = editContext.Validate();
+        if (isFormvalid)
         {
             counter = 0;
             PlaceHolderID = 1;
@@ -126,27 +118,21 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
         StateHasChanged();
     }
 
-
-    public async void HandleValidSubmit(EditContext editContext) // validerar sökformuläret
+    public async void HandleValidSubmit(EditContext editContext) // validates the search form
     {
-        isFormValid = editContext.Validate();
+        bool isFormValid = editContext.Validate();
         if (isFormValid)
         {
-            OnSearch(SearchTerm); // söker man på en tom sträng för att få fram alla trådar behöver man använda MsgCounter som tillhör alla trådar istället
-            if (SearchList.Count() == 0)
-            {
-                await MsgCounter();
-            }
-            else if (SearchList.Count() != 0) // Om man har sökt på något som inte är "" eller "Sort.All" så används metoden som räknar medelanden till de sökta trådarna
-            {
-                await SearchListMsgCounter();
-            }
+            searchCounter = 0;
+            SearchList.Clear();
+            NumberOfSearchMsgsList.Clear();
+            OnSearch(SearchTerm);
+            await SearchListMsgCounter();
         }
         StateHasChanged();
     }
 
-
-    public async Task CreateNewThread(string threadName) // Skapar en ny tråd
+    public async Task CreateNewThread(string threadName)
     {
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
@@ -158,39 +144,35 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
         await ThreadManager.CreateNewThread(Thread, tokenFromLocalStorage);
 
         ThreadsList = await ThreadManager.GetThreads();
-        await MsgCounter(); // Räknar om efter den nya tråden är tillagd
+        await MsgCounter();
     }
 
-
-    public async Task<List<int?>> MsgCounter() //retunerar en lista med alla antal medelanen till alla trådar
+    public async Task MsgCounter()
     {
-        foreach(var thread in ThreadsList) // Loopar igenom all threads
+        foreach(var thread in ThreadsList)
         {
-            var msgsList = await GetListAsync(); //hämtar en lista med alla medelanden till tråden i fråga
-            NumberOfMsgs = msgsList.Count(); // Räknar ut hur många meddelanden som finns på tråden
+            var msgsList = await GetListAsync();
+            NumberOfMsgs = msgsList.Count();
             if(NumberOfMsgs == null)
             {
-                NumberOfMsgs = 0; // Om det inte finns några medelanden på tråden så stoppar vi in 0
+                NumberOfMsgs = 0;
                 NumberOfMsgsList.Add(NumberOfMsgs);
             }
             else
             {
-                NumberOfMsgsList.Add(NumberOfMsgs); // lägger till antalet medelanden i listan med alla antal meddelanden som finns i trådarna
+                NumberOfMsgsList.Add(NumberOfMsgs);
             }
-            PlaceHolderID++; //ökar placeholderID så att nästa gång loopen kör så blir det nästa thread vars medelanden hämtas
+            PlaceHolderID++;
         }
-        return NumberOfMsgsList; // Retunerar listan med alla antal medelanden i. Index 0 tillhör Tråden med ID 1, Index 1 tillhör Tråden med ID 2 osv.
     }
 
-
-    public async Task<List<MessageModel>> GetListAsync() //Tillhör hämtningen av medelanden då man vill visa alla trådar
+    public async Task<List<MessageModel>> GetListAsync()
     {
-        var msgsInThread = await Task.Run(() => ThreadManager.GetThreadMessages(PlaceHolderID)); // PlaceHolderID är placeholder för ThreadID så GetListAsync() vet exakt vilken tråd den ska hämta medelanden ifrån
+        var msgsInThread = await Task.Run(() => ThreadManager.GetThreadMessages(PlaceHolderID));
         return msgsInThread;
     }
 
-
-    public async Task<List<MessageModel>> GetSearchListAsync() // Tillhör hämtningen av medelanden som tillhör de sökta trådarna
+    public async Task<List<MessageModel>> GetSearchListAsync()
     {
         var msgsInThread = await Task.Run(() => ThreadManager.GetThreadMessages(SearchPlaceHolderId));
         return msgsInThread;
@@ -198,12 +180,11 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
 
 
 
-    public async Task<List<int?>> SearchListMsgCounter() //räknar medelanden till de sökta trådarna
+    public async Task<List<int?>> SearchListMsgCounter()
     {
-        NumberOfSearchMsgsList.Clear(); //tömmer listan utifallatt man vill söka flera gånger på rad, så den gammla sökningen inte krockar med den nya. Fungerar samma som MsgCounter()
         foreach (var thread in SearchList)
         {
-            SearchPlaceHolderId = thread.Id; 
+            SearchPlaceHolderId = thread.Id;
             var msgs = await GetSearchListAsync();
             NumberOfSearchMsgs = msgs.Count();
             if(NumberOfSearchMsgs == null)
@@ -219,17 +200,15 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
         return NumberOfSearchMsgsList;
     }
 
-    public List<ThreadModel> OnSearch(string SearchTerm) //sök/sorterings metoden
+    public List<ThreadModel> OnSearch(string SearchTerm)
     {
-        searchCounter = 0;
-        if(SearchTerm != "" && SearchTerm != "Sort.All") //Kollar så att sökSträngen inte är koliderar med upptagna funktions strängar
+        if(SearchTerm != "") //if SearchTerm contains the word/sentance enterd in the search feild
         {
-            SearchList.Clear(); // Rensar listan så sökningar efter varandra inte krockar
             foreach (var thread in ThreadsList)
             {
-                if (thread.Name.Contains(SearchTerm)) //Kollar ifall en tråds namn inehåller söksträngen
+                if (thread.Name.Contains(SearchTerm))
                 {
-                    SearchList.Add(thread); // ifall den gör, då läggs den till i listan med sökta trådar.
+                    SearchList.Add(thread);
                 }
                 else
                 {
@@ -237,20 +216,9 @@ else if(SearchList.Count() > 0 && NumberOfSearchMsgsList.Count() != 0) @*Denna e
                 }
             }
         }
-        else if (SearchTerm == "") // Om söksträngen är "" ska alla trådar visas. Då Vill vi att SearchList är tom så rätt if-sats renderas i html-delen
+        else if (SearchTerm == "") // If the SearchTerm Contains an empty string, return SearchList as empty
         {
             SearchList.Clear();
-        }
-        else if (SearchTerm == "Sort.All") // Om Söksträngen är "Sort.All" då vill vi sortera och visa upp alla trådar i alfabetisk ordning. Men den gör det med SearchList, dvs koden är inte jätte konsekvent
-        {
-            SearchList.Clear();
-            List<ThreadModel> tmpList = new();
-            foreach (var thread in ThreadsList)
-            {
-                tmpList.Add(thread);
-            }
-            IEnumerable<ThreadModel> IeList = tmpList.OrderBy(t => t.Name); //sorterar med linq
-            SearchList = IeList.ToList(); // konverterar listan från en Ienumerable till en vanlig Lista
         }
         return SearchList;
     }
