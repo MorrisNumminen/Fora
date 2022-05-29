@@ -5,8 +5,9 @@ namespace Fora.Client.Services
     {
         Task<List<ThreadModel>> GetThreads();
         Task<string> CreateNewThread(ThreadModel threadToCreate, string token);
-        Task<List<MessageModel>> GetThreadMessages(int threadId);
+        Task<List<MessageModel?>> GetThreadMessages(int threadId);
         Task<string> CreateNewMessage(MessageModel messageToCreate, string token);
-        Task DeleteMessage(int messageDelId, string token);
+        Task PutMessageAsync(MessageDto message);
+        Task MarkAsDeletedMessageAsync(MessageDto message);
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Fora.Client.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fora.Server.Controllers
 {
@@ -20,10 +21,11 @@ namespace Fora.Server.Controllers
 
         // GET api/<UsersController>
         [HttpGet("getinterests")]
-        public async Task<List<InterestModel>> GetInterests()
+        public async Task<ActionResult<List<InterestModel>>> GetAsync()
         {
-            // Returnera lista med interests
-            return _dbContext.Interests.ToList();
+            List<InterestModel> list = new();
+            list = await _dbContext.Interests.ToListAsync();
+            return Ok(list);
         }
 
         [HttpPost("AddUserInterest")]
@@ -70,19 +72,12 @@ namespace Fora.Server.Controllers
         [HttpPost("createinterest")]
         public async Task<ActionResult<string>> CreateNewInterest([FromBody] InterestModel interestToCreate, [FromQuery] string token)
         {
-            
-
-            InterestModel newInterest = new();
-            newInterest.Name = interestToCreate.Name;
-
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             
-
             if (identityUser != null)
             {
                 var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
-
-                // interestToCreate.User = user;
+                interestToCreate.UserId = user.Id;
 
                 _dbContext.Interests.Add(interestToCreate);
                 await _dbContext.SaveChangesAsync();

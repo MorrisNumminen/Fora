@@ -6,7 +6,7 @@
 @page "/thread/{ThreadId:int}"
 
 
-<PageTitle>Thread Name goes here</PageTitle>
+<PageTitle>Thread Page</PageTitle>
 <style>
 body {
   background-image: url('https://static0.srcdn.com/wordpress/wp-content/uploads/2022/02/Elden-Ring-Berserk-Easter-Egg-Guts-Greatsword.jpg');
@@ -14,29 +14,89 @@ body {
 </style>
 
 
+
 <h3>@CurrentThread.Name</h3>
+
+
+
+    <EditForm Model="@NewMessage" OnValidSubmit="CreateMessage">
+        <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
+        <button type="submit">Post Message</button>
+    </EditForm>
+
+
 
 @foreach( var MessageObj in Messages)
 {
+    if(CurrentUser.UserName == MessageObj.User.Username)
+    {
+        Color = "bg-primary";
+    }
+    else
+    {
+        Color = "";
+    }
+    <div class="card @Color">
+            <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
+            <div class="p-0">
+                <h4><b>@MessageObj.User.Username</b></h4>
+                <p>
+                    @if (MessageObj.User.Banned)
+                    {
+                        <small class="text-info">[Banned] </small>
 
-    <div class="card">
-        <img src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Avatar" style="width:5%">
-        <h4><b>@MessageObj.User.Username</b></h4>
-        <div class="container">
-            <p>@MessageObj.Message</p>
-        </div>
-        @*<button @onclick="DeleteMessage"></button> Skicka med ID till metod för meddelande som skall raderas*@
-    </div>
+                    }
+                    @if (MessageObj.User.Deleted)
+                    {
+                        <small class="text-info">[User Deleted] </small>
+                    }
+                </p>
+            </div>
+
+        <div class="m-lg-3 card card-body">
+            @if(CurrentUser.UserName == MessageObj.User.Username){
+                if (MessageObj.Deleted)
+                {
+                   <p class="fw-bold">This message was deleted by the poster</p>
+                }
+                else if (MessageObj.EditStage)
+                {
+                    <EditForm Model="@EditedMessage" OnValidSubmit="() => SaveMessage(MessageObj.Id)">
+                        <InputTextArea @bind-Value="EditedMessage.Message">@MessageObj.Message</InputTextArea>
+                        <button class="mx-2 my-1" type="submit">Save changes</button>
+                    </EditForm>
+
+                }
+                else
+                {
+                    <p>@MessageObj.Message</p>
+                    <div>
+                        <btn class="btn btn-outline-info" @onclick="() => EditMessage(MessageObj.Id)" >Edit</btn>
+                        <btn class="btn btn-outline-danger" @onclick="() => MarkAsDeleted(MessageObj.Id)" >Delete</btn>
+                    </div>
+                }
+            }
+            else
+            {
+                if (MessageObj.Deleted)
+                {
+                    <p class="fw-bold">This message was deleted by the poster</p>
+                }
+                else
+                {
+                    <p>@MessageObj.Message</p>
+                }
+            }
+
+            </div>          
+        </div>          
+
+
 
     <br/>
 }
 
-<div>
-<EditForm Model="@NewMessage" OnSubmit="CreateMessage">
-    <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
-    <button type="submit">Post Message</button>
-</EditForm>
-</div>
+
 
 
 @code {
@@ -44,53 +104,81 @@ body {
     [Parameter]
     public int ThreadId { get; set; }
 
-    public UserModel CurrentUser { get; set; }
+    public ApplicationUser CurrentUser { get; set; }
+    public UserModel CurrentDbUser { get; set; }
 
     public ThreadModel CurrentThread = new();
 
     public MessageModel NewMessage { get; set; } = new();
-
-    //public MsgDto NewMessage { get; set; } = new();
+    public MessageDto EditedMessage { get; set; } = new();
+    public string TestMessage { get; set; } = String.Empty;
+    public int EditValue { get; set; }
+    public string Color { get; set; }
+    
 
     public List<MessageModel> Messages = new();
 
-
-
     string tokenFromLocalStorage = "Före token";
-
+    private string? token;
+    private LoginDto? loginStatus;
 
     protected override async Task OnInitializedAsync()
-    {
+    { 
+        token = await LocalStorage.GetItemAsStringAsync("token");
 
-        Console.WriteLine(ThreadId);
-
+        CurrentUser = await UserManager.GetAsync(token);
+        loginStatus = await UserManager.CheckUserLogin(token);
         Messages = await ThreadManager.GetThreadMessages(ThreadId);
-
+        Messages.Reverse();
     }
 
+  
 
     public async Task CreateMessage()
     {
+
+
         // Get token
         tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
 
         // Skickar token tillsammans med Message objekt
-        Console.WriteLine("CreateMessage() Körs");
         NewMessage.ThreadId = ThreadId;
+        NewMessage.Date = DateTime.Now.ToString();
+
         await ThreadManager.CreateNewMessage(NewMessage, tokenFromLocalStorage);
-
-
-        //StateHasChanged();
-
+        Messages = await ThreadManager.GetThreadMessages(ThreadId);
+        Messages.Reverse();
+        StateHasChanged();
     }
 
-    public async Task DeleteMessage(int id)
+    public async Task EditMessage(int messageId)
     {
-        Console.WriteLine("Del 1");
-        tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
-
-
-        
+        var message = Messages.Find(m => m.Id == messageId);
+        message.EditStage = true;
     }
 
+    public async Task SaveMessage(int id)
+    {
+        EditedMessage.MessageId = id;
+        await ThreadManager.PutMessageAsync(EditedMessage);
+
+        var message = Messages.Find(m => m.Id == id);
+        message.EditStage = false;
+
+        RefreshList();
+    }
+
+    public async Task MarkAsDeleted(int id)
+    {
+        EditedMessage.MessageId = id;
+        await ThreadManager.MarkAsDeletedMessageAsync(EditedMessage);
+        RefreshList();
+    }
+
+        public async Task RefreshList()
+    {
+        Messages = await ThreadManager.GetThreadMessages(ThreadId);
+        Messages.Reverse();
+        StateHasChanged();
+    }
 }
