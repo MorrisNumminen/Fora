@@ -58,9 +58,8 @@ body {
 
 @foreach(var thread in ThreadsList)
 {
-    <div>
-        @*<a> @Interest.Name</a>*@
-        @if(thread.User != null)
+    Console.WriteLine(NumberOfMsgsList[counter]);
+    @if(thread.User != null)
         {
             @if(CurrentUser.UserName == thread.User.Username)
             {
@@ -74,8 +73,13 @@ body {
                 }
             }
         }
-        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>        
-    </div>
+        @if(counter == NumberOfMsgsList.Count())
+        {
+            counter = 0;
+        }
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+        <p>Messages: @NumberOfMsgsList[counter]</p>
+        counter++;
     <br/>
 }
 
@@ -114,12 +118,9 @@ body {
 
     protected override async Task OnInitializedAsync()
     {
+        PlaceHolderID = 1;
         //    return base.OnInitializedAsync();
         ThreadsList = await ThreadManager.GetThreads();
-        foreach(ThreadModel thread in ThreadsList)
-        {
-            
-        }
         //ThreadsList.Sort();
         token = await LocalStorage.GetItemAsStringAsync("token");
 
@@ -127,6 +128,7 @@ body {
         loginStatus = await UserManager.CheckUserLogin(token);
 
         allInterest = await InterestManager.GetInterests();
+        await MsgCounter();
     }
 
     private void ToggleCreateThread()
