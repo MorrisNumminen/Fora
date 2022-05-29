@@ -160,7 +160,7 @@ body {
     public async Task SaveMessage(int id)
     {
         EditedMessage.MessageId = id;
-        await ThreadManager.PutMessageAsync(EditedMessage);
+        await ThreadManager.PutMessageAsync(EditedMessage.MessageId, EditedMessage.Message);
 
         var message = Messages.Find(m => m.Id == id);
         message.EditStage = false;

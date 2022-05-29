@@ -55,9 +55,9 @@ namespace Fora.Client.Services
             await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/deletemarkmessage", message);
         }
 
-        public async Task PutMessageAsync(MessageDto message)
+        public async Task PutMessageAsync(int messageId, string newMessage)
         {
-            await _httpClient.PutAsJsonAsync<MessageDto>($"api/Threads/updatemessage", message);
+            await _httpClient.PutAsJsonAsync<string>($"api/Threads/updatemessage?messageId={messageId}", newMessage);
         }
     }
 }

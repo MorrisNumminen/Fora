@@ -92,12 +92,12 @@ namespace Fora.Server.Controllers
         }
 
         [HttpPut("updatemessage")]
-        public async Task<ActionResult> PutMessageAsync([FromBody] MessageDto message)
+        public async Task<ActionResult> PutMessageAsync([FromQuery] int messageId, [FromBody] string newMessage)
         {
-            var dbMessage = await _dbContext.Messages.FindAsync(message.MessageId);
+            var dbMessage = await _dbContext.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
             if (dbMessage != null)
             {
-                dbMessage.Message = message.Message;
+                dbMessage.Message = newMessage;
                 dbMessage.Edited = true;
                 _dbContext.Messages.Update(dbMessage);
                 await _dbContext.SaveChangesAsync();
