@@ -220,29 +220,5 @@ SearchMethod
 
     }
 
-    public async Task MsgCounter()
-    {
-        foreach(var thread in ThreadsList)
-        {
-            var msgsList = await GetListAsync();
-            NumberOfMsgs = msgsList.Count();
-            if(NumberOfMsgs == null)
-            {
-                NumberOfMsgs = 0;
-                NumberOfMsgsList.Add(NumberOfMsgs);
-            }
-            else
-            {
-                NumberOfMsgsList.Add(NumberOfMsgs);
-            }
-            PlaceHolderID++;
-        }
-    }
-
-    public async Task<List<MessageModel>> GetListAsync()
-    {
-        var tmpList = await Task.Run(() => ThreadManager.GetThreadMessages(PlaceHolderID));
-        return tmpList;
-    }
 
 }
