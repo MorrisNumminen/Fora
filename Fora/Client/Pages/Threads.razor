@@ -77,7 +77,6 @@ SearchMethod
 
 @foreach(var thread in ThreadsList)
 {
-    //Console.WriteLine(NumberOfMsgsList[counter]);
     @if(thread.User != null)
     {
         @if(CurrentUser.UserName == thread.User.Username)
@@ -98,6 +97,7 @@ SearchMethod
         <a>@thread.Interest.Name</a>
     }
     <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
+    <p><small> Messages: @thread.MessageCount </small></p>
     <br/>
 }
 
@@ -124,6 +124,9 @@ SearchMethod
 
     public ThreadModel Thread { get; set; } = new();
 
+    public int MessageCountId { get; set; }
+    public int MessageCount { get; set; }
+
     private bool showCreateThread;
     public ApplicationUser CurrentUser { get; set; }
     public UserModel ThreadCreator { get; set; }
@@ -133,7 +136,20 @@ SearchMethod
 
     protected override async Task OnInitializedAsync()
     {
+
+
         ThreadsList = await ThreadManager.GetThreads();
+        foreach(var thread in ThreadsList)
+        {
+            var messages = await ThreadManager.GetThreadMessages(thread.Id);
+            MessageCount = messages.Count();
+            thread.MessageCount = MessageCount;
+        }
+
+
+
+
+
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         CurrentUser = await UserManager.GetAsync(token);
@@ -154,12 +170,12 @@ SearchMethod
             //Search by thread title
             if(SearchDto.SearchMethod == "thread")
             {
-            SearchList = tempList.Where(a => a.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
+                SearchList = tempList.Where(a => a.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
             }
             //Search by interest name
             else if(SearchDto.SearchMethod == "interest")
             {
-            SearchList = tempList.Where(a => a.Interest.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
+                SearchList = tempList.Where(a => a.Interest.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
             }
 
         }
@@ -176,6 +192,13 @@ SearchMethod
         }
 
         ThreadsList = SearchList;
+
+        foreach(var thread in ThreadsList)
+        {
+            var messages = await ThreadManager.GetThreadMessages(thread.Id);
+            MessageCount = messages.Count();
+            thread.MessageCount = MessageCount;
+        }
         StateHasChanged();
     }
 
@@ -201,7 +224,5 @@ SearchMethod
         await ThreadManager.CreateNewThread(Thread, tokenFromLocalStorage);
         showCreateThread = false;
         ThreadsList = await ThreadManager.GetThreads();
-        
-
     }
 }

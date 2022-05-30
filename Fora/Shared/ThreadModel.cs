@@ -9,6 +9,7 @@ namespace Fora.Shared
         public int Id { get; set; }
         public string Name { get; set; } = String.Empty;
         public List<MessageModel>? Messages { get; set; }
+        public int? MessageCount { get; set; }
 
         // Relations
         [ForeignKey(nameof(Interest))]
