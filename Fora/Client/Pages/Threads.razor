@@ -79,31 +79,25 @@ SearchMethod
 {
     //Console.WriteLine(NumberOfMsgsList[counter]);
     @if(thread.User != null)
+    {
+        @if(CurrentUser.UserName == thread.User.Username)
         {
-            @if(CurrentUser.UserName == thread.User.Username)
+            @if(thread.User.Banned)
             {
-                @if(thread.User.Banned)
-                {
-                    <a style="color: orange" >[Banned User] </a>
-                }
-                @if (thread.User.Deleted)
-                {
-                    <a style="color: orange" >[Deleted User] </a>
-                }
+                <a style="color: orange" >[Banned User] </a>
+            }
+            @if (thread.User.Deleted)
+            {
+                <a style="color: orange" >[Deleted User] </a>
             }
         }
-        @if(counter == NumberOfMsgsList.Count())
-        {
-            counter = 0;
-        }
+    }
+       
     @if(thread.Interest != null)
     {
         <a>@thread.Interest.Name</a>
     }
-
-        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
-       <p>Messages: @NumberOfMsgsList[counter]</p>
-        counter++;
+    <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
     <br/>
 }
 
@@ -120,11 +114,6 @@ SearchMethod
         SortMethod = "az"
     };
 
-    //placeholder List
-    public int PlaceHolderID { get; set; }
-    public int counter { get; set; }
-    public int? NumberOfMsgs { get; set; }
-    public List<int?> NumberOfMsgsList = new();
 
     public InterestModel Interest { get; set; } = new();
     public List<InterestModel>? allInterest = new();
@@ -144,17 +133,13 @@ SearchMethod
 
     protected override async Task OnInitializedAsync()
     {
-        PlaceHolderID = 1;
-        //    return base.OnInitializedAsync();
         ThreadsList = await ThreadManager.GetThreads();
-        //ThreadsList.Sort();
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         CurrentUser = await UserManager.GetAsync(token);
         loginStatus = await UserManager.CheckUserLogin(token);
 
         allInterest = await InterestManager.GetInterests();
-        await MsgCounter();
     }
 
     public async Task GetSearchList()
@@ -219,30 +204,4 @@ SearchMethod
         
 
     }
-
-    public async Task MsgCounter()
-    {
-        foreach(var thread in ThreadsList)
-        {
-            var msgsList = await GetListAsync();
-            NumberOfMsgs = msgsList.Count();
-            if(NumberOfMsgs == null)
-            {
-                NumberOfMsgs = 0;
-                NumberOfMsgsList.Add(NumberOfMsgs);
-            }
-            else
-            {
-                NumberOfMsgsList.Add(NumberOfMsgs);
-            }
-            PlaceHolderID++;
-        }
-    }
-
-    public async Task<List<MessageModel>> GetListAsync()
-    {
-        var tmpList = await Task.Run(() => ThreadManager.GetThreadMessages(PlaceHolderID));
-        return tmpList;
-    }
-
 }
