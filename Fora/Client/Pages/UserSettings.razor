@@ -61,7 +61,7 @@
             @foreach(var favo in userInterests)
             {
                 
-                <li><em>@favo.Name </em><button onclick="@(() => RemoveUserInterest(favo.Id))" 
+                <li><em>@favo.Interest.Name </em><button onclick="@(() => RemoveUserInterest(favo.InterestId))" 
                 class="btn btn-outline-danger"> Remove </button></li>
 
             }
@@ -129,7 +129,8 @@
 
     public InterestModel Interest { get; set; } = new();
     public ApplicationUser authUser { get; set; }
-    public List<InterestModel> userInterests = new();
+    public UserModel dbUser {get; set;}
+    public List<UserInterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
     public List<ThreadModel> userThreads = new();
 
@@ -154,6 +155,8 @@
 
         loginStatus = await UserManager.CheckUserLogin(token);
 
+        dbUser = await UserManager.GetDbAsync(token);
+
         userInterests = await InterestManager.GetUserInterests(token);
 
         userThreads = await ThreadManager.GetThreads();
@@ -168,6 +171,7 @@
 
     private async Task AddInterest(int id)
     {
+        
         await InterestManager.AddUserInterests(id, token);
         userInterests = await InterestManager.GetUserInterests(token);
         StateHasChanged();
@@ -182,15 +186,12 @@
 
     public async Task RemoveUserInterest(int id)
     {
+            var removeInterest = userInterests.FirstOrDefault(x => x.UserId == dbUser.Id);
 
-        var ui = interests.FirstOrDefault(ui => ui.Id == id);
-
-        if(ui != null)
-        {
-            await InterestManager.RemoveUserInterests(ui, token);
+            await InterestManager.RemoveUserInterests(removeInterest, token);
             userInterests = await InterestManager.GetUserInterests(token);
             StateHasChanged();
-        }
+        
     }
 
     public async Task CreateNewInterest()

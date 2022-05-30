@@ -40,8 +40,8 @@ namespace Fora.Server.Controllers
                 UserInterestModel userInterest = new UserInterestModel()
                 {
                     UserId = dbUser.Id,
-                    InterestId = dbInterest.Id,
-                    Interest = dbInterest
+                    InterestId = dbInterest.Id
+                   
                 };
 
                 _dbContext.UserInterests.Add(userInterest);
@@ -54,14 +54,14 @@ namespace Fora.Server.Controllers
         }
 
         [HttpGet("UserInterests")]
-        public async Task<ActionResult<List<InterestModel>>> GetUserInterests([FromQuery] string token)
+        public async Task<ActionResult<List<UserInterestModel>>> GetUserInterests([FromQuery] string token)
         {
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             var user = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
 
             if(user != null && identityUser != null)
             {
-                var userInterests = _dbContext.UserInterests.Where(ui => ui.UserId == user.Id).ToList();
+                var userInterests = _dbContext.UserInterests.Where(ui => ui.UserId == user.Id).Include(x => x.Interest).ToList();
 
                 return Ok(userInterests);
             }
@@ -107,21 +107,16 @@ namespace Fora.Server.Controllers
 
 
         [HttpPost("removeuserinterest")]
-        public async Task RemoveUserInterest([FromBody] InterestModel interest, [FromQuery] string token)
+        public async Task RemoveUserInterest([FromBody] UserInterestDto userInterest, [FromQuery] string token)
         {
-
-            var dbRemoveInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
+           
             var authUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
 
-            if (dbRemoveInterest != null && dbUser != null)
+            if (dbUser != null)
             {
-                _dbContext.UserInterests.Remove(new UserInterestModel()
-                {
-                    User = dbUser,
-                    Interest = dbRemoveInterest,
-                });
-
+                var interest =  await _dbContext.UserInterests.FirstOrDefaultAsync(x => x.UserId == userInterest.UserId && x.InterestId == userInterest.InterestId);
+                _dbContext.UserInterests.Remove(interest);               
                 await _dbContext.SaveChangesAsync();
             }
         }

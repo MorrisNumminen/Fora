@@ -69,14 +69,14 @@ namespace Fora.Server.Data
             // Seed Threads data to database
             modelBuilder.Entity<ThreadModel>()
                 .HasData(
-                new ThreadModel() { Id = 1, Name = "Introduce yourself!", UserId = 1 },
-                new ThreadModel() { Id = 2, Name = "DS3 Cheat codes plz", UserId = 1 },
-                new ThreadModel() { Id = 3, Name = "How to get rich in sims 66", UserId = 1 },
-                new ThreadModel() { Id = 4, Name = "Why is my game lagging???", UserId = 1 },
-                new ThreadModel() { Id = 5, Name = "How to git gud", UserId = 1 },
-                new ThreadModel() { Id = 6, Name = "New Lego City Speedrun Record!", UserId = 1 },
-                new ThreadModel() { Id = 7, Name = "GTA hydra abuse", UserId = 1 },
-                new ThreadModel() { Id = 8, Name = "Tetris laggy. What is my bottleneck??? help", UserId = 1 }
+                new ThreadModel() { Id = 1, Name = "Introduce yourself!", UserId = 1, InterestId = 1 },
+                new ThreadModel() { Id = 2, Name = "DS3 Cheat codes plz", UserId = 1, InterestId = 2 },
+                new ThreadModel() { Id = 3, Name = "How to get rich in sims 66", UserId = 1, InterestId = 3 },
+                new ThreadModel() { Id = 4, Name = "Why is my game lagging???", UserId = 1, InterestId = 4 },
+                new ThreadModel() { Id = 5, Name = "How to git gud", UserId = 1, InterestId = 5 },
+                new ThreadModel() { Id = 6, Name = "New Lego City Speedrun Record!", UserId = 1, InterestId = 6 },
+                new ThreadModel() { Id = 7, Name = "GTA hydra abuse", UserId = 1, InterestId = 7 },
+                new ThreadModel() { Id = 8, Name = "Tetris laggy. What is my bottleneck??? help", UserId = 1, InterestId = 8 }
                 );
 
 

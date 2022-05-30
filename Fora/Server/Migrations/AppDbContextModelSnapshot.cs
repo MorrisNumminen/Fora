@@ -4,18 +4,16 @@ using Fora.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Fora.Server.Migrations.AppDb
+namespace Fora.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220530125911_AddedMessageCount")]
-    partial class AddedMessageCount
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,48 +165,56 @@ namespace Fora.Server.Migrations.AppDb
                         new
                         {
                             Id = 1,
+                            InterestId = 1,
                             Name = "Introduce yourself!",
                             UserId = 1
                         },
                         new
                         {
                             Id = 2,
+                            InterestId = 2,
                             Name = "DS3 Cheat codes plz",
                             UserId = 1
                         },
                         new
                         {
                             Id = 3,
+                            InterestId = 3,
                             Name = "How to get rich in sims 66",
                             UserId = 1
                         },
                         new
                         {
                             Id = 4,
+                            InterestId = 4,
                             Name = "Why is my game lagging???",
                             UserId = 1
                         },
                         new
                         {
                             Id = 5,
+                            InterestId = 5,
                             Name = "How to git gud",
                             UserId = 1
                         },
                         new
                         {
                             Id = 6,
+                            InterestId = 6,
                             Name = "New Lego City Speedrun Record!",
                             UserId = 1
                         },
                         new
                         {
                             Id = 7,
+                            InterestId = 7,
                             Name = "GTA hydra abuse",
                             UserId = 1
                         },
                         new
                         {
                             Id = 8,
+                            InterestId = 8,
                             Name = "Tetris laggy. What is my bottleneck??? help",
                             UserId = 1
                         });
@@ -219,7 +225,7 @@ namespace Fora.Server.Migrations.AppDb
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("InterestId")
+                    b.Property<int>("InterestId")
                         .HasColumnType("int");
 
                     b.HasKey("UserId", "InterestId");

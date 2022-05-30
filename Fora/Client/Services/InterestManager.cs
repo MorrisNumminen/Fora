@@ -32,20 +32,25 @@ namespace Fora.Client.Services
         }
         
 
-        public async Task AddUserInterests(int interestId, string token)
+        public async Task AddUserInterests(int interestId,  string token)
         {
              var response = await _httpClient.PostAsJsonAsync<int>($"api/Interests/AddUserInterest?token={token}", interestId);
         }
 
-        public async Task RemoveUserInterests(InterestModel removeInterest, string token)
+        public async Task RemoveUserInterests(UserInterestModel user, string token)
         {
-             await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/RemoveUserInterest?token={token}", removeInterest);
+            UserInterestDto interestToRemove = new()
+            {
+                UserId = user.UserId,
+                InterestId = user.InterestId
+            };
+             var response = await _httpClient.PostAsJsonAsync<UserInterestDto>($"api/Interests/RemoveUserInterest?token={token}", interestToRemove);
 
         }
 
-        public async Task<List<InterestModel>> GetUserInterests(string token)
+        public async Task<List<UserInterestModel>> GetUserInterests(string token)
         {
-            var response = await _httpClient.GetFromJsonAsync<List<InterestModel>>($"api/Interests/UserInterests?token={token}");
+            var response = await _httpClient.GetFromJsonAsync<List<UserInterestModel>>($"api/Interests/UserInterests?token={token}");
 
             return response;
         }

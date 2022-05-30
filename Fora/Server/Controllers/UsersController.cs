@@ -32,6 +32,14 @@ namespace Fora.Server.Controllers
             return currentUser;
         }
 
+        [HttpGet("DbAsync/{token}")]
+        public async Task<UserModel> GetDbAsync(string token)
+        {
+            var authUser = _authContext.Users.FirstOrDefault(u => u.Token == token);
+            var dbUser = _context.Users.FirstOrDefault(u => u.Username == authUser.UserName);
+            return dbUser;
+        }
+
         // POST api/<UsersController>
         [HttpPost]
         public async Task<ActionResult<string>> SignUpAsync([FromBody] UserDto userToRegister)
@@ -63,20 +71,14 @@ namespace Fora.Server.Controllers
 
             }
             return BadRequest("Could not create a user");
-            // Create token
-            // Add that token to the Identity Db
-            // Add the new user to the other db too
-            // Send token back
-
-
+          
         }
 
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userToLogin)
         {
-            // Calla Api
-
+        
             var user = await _signInManager.UserManager.FindByNameAsync(userToLogin.Username);
 
             if (user != null && await _signInManager.UserManager.CheckPasswordAsync(user, userToLogin.Password))
@@ -89,6 +91,10 @@ namespace Fora.Server.Controllers
 
             return BadRequest("Could not login");
         }
+
+
+
+
 
         [HttpGet("check/{token}")]
         public async Task<ActionResult<LoginDto>> CheckUserLogin([FromRoute] string token)
@@ -188,7 +194,7 @@ namespace Fora.Server.Controllers
             return BadRequest();
         }
 
-        [HttpPost("change")]
+        [HttpPut("change")]
         public async Task<IActionResult> ChangeUserPassword([FromBody] UserDto user, [FromQuery] string newPassword, [FromQuery] string token)
         {
             var userWithToken = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);

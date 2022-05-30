@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Fora.Server.Migrations.AppDb
+namespace Fora.Server.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -50,6 +50,7 @@ namespace Fora.Server.Migrations.AppDb
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MessageCount = table.Column<int>(type: "int", nullable: true),
                     InterestId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -124,33 +125,38 @@ namespace Fora.Server.Migrations.AppDb
                 });
 
             migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Banned", "Deleted", "Username" },
+                values: new object[] { 1, false, false, "Casper" });
+
+            migrationBuilder.InsertData(
                 table: "Interests",
                 columns: new[] { "Id", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { 1, "Games", null },
-                    { 2, "Sports", null },
-                    { 3, "Politics", null },
-                    { 4, "Religion", null },
-                    { 5, "Design", null },
-                    { 6, "Garden", null },
-                    { 7, "Technology", null },
-                    { 8, "Pets", null }
+                    { 1, "Games", 1 },
+                    { 2, "Sports", 1 },
+                    { 3, "Politics", 1 },
+                    { 4, "Religion", 1 },
+                    { 5, "Design", 1 },
+                    { 6, "Garden", 1 },
+                    { 7, "Technology", 1 },
+                    { 8, "Pets", 1 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Threads",
-                columns: new[] { "Id", "InterestId", "Name", "UserId" },
+                columns: new[] { "Id", "InterestId", "MessageCount", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { 1, null, "Introduce yourself!", null },
-                    { 2, null, "DS3 Cheat codes plz", null },
-                    { 3, null, "How to get rich in sims 66", null },
-                    { 4, null, "Why is my game lagging???", null },
-                    { 5, null, "How to git gud", null },
-                    { 6, null, "New Lego City Speedrun Record!", null },
-                    { 7, null, "GTA hydra abuse", null },
-                    { 8, null, "Tetris laggy. What is my bottleneck??? help", null }
+                    { 1, 1, null, "Introduce yourself!", 1 },
+                    { 2, 2, null, "DS3 Cheat codes plz", 1 },
+                    { 3, 3, null, "How to get rich in sims 66", 1 },
+                    { 4, 4, null, "Why is my game lagging???", 1 },
+                    { 5, 5, null, "How to git gud", 1 },
+                    { 6, 6, null, "New Lego City Speedrun Record!", 1 },
+                    { 7, 7, null, "GTA hydra abuse", 1 },
+                    { 8, 8, null, "Tetris laggy. What is my bottleneck??? help", 1 }
                 });
 
             migrationBuilder.CreateIndex(

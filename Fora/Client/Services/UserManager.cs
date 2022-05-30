@@ -28,16 +28,28 @@ namespace Fora.Client.Services
             return user;
         }
 
+        public async Task<UserModel> GetDbAsync(string token)
+        {
+            var response = await _http.GetAsync($"api/users/DbAsync/{token}");
+            var result = await response.Content.ReadAsStringAsync();
+            var user = JsonConvert.DeserializeObject<UserModel>(result);
+
+            return user;
+        }
+
         public async Task<string> RegisterUser(UserDto userToRegister)
         {
             // Registrera användare i API:t
 
             var response = await _http.PostAsJsonAsync<UserDto>("api/users", userToRegister);
 
-            var token = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                _navigationManager.NavigateTo("Login");
+            }
 
-            _navigationManager.NavigateTo("Login");
-            return token;
+            
+            return await response.Content.ReadAsStringAsync();
         }
 
         public async Task<string> LogInUser(UserDto userToLogin)
@@ -94,7 +106,7 @@ namespace Fora.Client.Services
         public async Task ChangePasswordUser(UserDto user, string newPassword, string token)
         {
 
-            var changePasswordResponse = await _http.PostAsJsonAsync($"api/users/change?newPassword={newPassword}&token={token}", user);
+            var changePasswordResponse = await _http.PutAsJsonAsync($"api/users/change?newPassword={newPassword}&token={token}", user);
         }
 
     }

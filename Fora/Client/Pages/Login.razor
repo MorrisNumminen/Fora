@@ -23,38 +23,32 @@ body {
     <InputText @bind-Value="@User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="@User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Log In</button>
+    <h4 class="text-danger"> @Message</h4>
 </EditForm>
 
 
 
 @code {
     public UserDto User { get; set; } = new();
+    public string Message { get; set; } = string.Empty;
 
     private async Task LogInUser()
     {
         Console.WriteLine("click");
         var token = await UserManager.LogInUser(User);
-        //var username = await UserManager.LogInUser(User);
 
-        // Add the token to the local storage
-        await LocalStorage.SetItemAsStringAsync("token", token);
-        // await LocalStorage.SetItemAsStringAsync("username", username);
-
-        // Get token from LS
-
-        var tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");
-
-        if(tokenFromLocalStorage == null)
+        if(token == "Could not login")
         {
+            Message = "Could not login";
+            StateHasChanged();
+            await Task.Delay(3000);
             NavigationManager.NavigateTo("registeruser");
         }
-        else 
+        else
         {
-            // Get stuff from api with the token as key
+            await LocalStorage.SetItemAsStringAsync("token", token);           
+            var tokenFromLocalStorage = await LocalStorage.GetItemAsStringAsync("token");  
             NavigationManager.NavigateTo("UserSettings", true);
-        }
+        }          
     }
-
-
-
 }

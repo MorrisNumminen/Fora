@@ -32,7 +32,7 @@
 {   
     <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h5 class="card-title">@interests.Name</h5>
+    <h5 class="card-title">@interests.Interest.Name</h5>
     <a @onclick="ToThreads" class="btn btn-success">Threads</a>
   </div>
 </div>
@@ -49,7 +49,7 @@
 
 @code {
     private List<InterestModel> allInterests = new();
-    private List<InterestModel> userInterests = new();
+    private List<UserInterestModel> userInterests = new();
     private string? token;
 
     protected override async Task OnInitializedAsync()

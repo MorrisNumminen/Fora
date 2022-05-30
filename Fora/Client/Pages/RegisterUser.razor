@@ -17,15 +17,18 @@ body {
     <InputText @bind-Value="User.Username" type="text" placeholder="Username"></InputText>
     <InputText @bind-Value="User.Password" type="password" placeholder="Password"></InputText>
     <button type="submit">Register</button>
+    <h4 class="text-danger">@Message</h4>
 </EditForm>
 
 
 @code {
     public UserDto User { get; set; } = new();
+    public string Message { get; set; } = string.Empty;
 
-    private void RegUser()
+    private async Task RegUser()
     {
-        UserManager.RegisterUser(User);
+        Message = await UserManager.RegisterUser(User);
+        
     }
      
 }
