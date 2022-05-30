@@ -13,17 +13,11 @@ body {
 }
 </style>
 
-
-
 <h3>@CurrentThread.Name</h3>
-
-
-
     <EditForm Model="@NewMessage" OnValidSubmit="CreateMessage">
         <InputTextArea @bind-Value="NewMessage.Message" type="textarea" placeholder="Enter message:"></InputTextArea>
         <button type="submit">Post Message</button>
     </EditForm>
-
 
 
 @foreach( var MessageObj in Messages)
@@ -90,9 +84,6 @@ body {
 
             </div>          
         </div>          
-
-
-
     <br/>
 }
 
@@ -131,8 +122,6 @@ body {
         Messages = await ThreadManager.GetThreadMessages(ThreadId);
         Messages.Reverse();
     }
-
-
 
     public async Task CreateMessage()
     {

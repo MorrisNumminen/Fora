@@ -9,34 +9,32 @@
 @page "/interests"
 
 
-
-
 <div class="row">
 
     <div class="col-6">
         <h3>All Interests</h3>
-@foreach(var interests in allInterests)
-{
-    <div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">@interests.Name</h5>
-    <a @onclick="ToThreads" class="btn btn-primary">Threads</a>
-  </div>
-</div>
-}
+        @foreach (var interests in allInterests)
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">@interests.Name</h5>
+                    <a @onclick="ToThreads" class="btn btn-primary">Threads</a>
+                </div>
+            </div>
+        }
     </div>
 
     <div class="col-6">
         <h3> Favorite Interests</h3>
-@foreach( var interests in userInterests)
-{   
-    <div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">@interests.Interest.Name</h5>
-    <a @onclick="ToThreads" class="btn btn-success">Threads</a>
-  </div>
-</div>
-}
+        @foreach (var interests in userInterests)
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">@interests.Interest.Name</h5>
+                    <a @onclick="ToThreads" class="btn btn-success">Threads</a>
+                </div>
+            </div>
+        }
     </div>
 
 </div>
@@ -56,14 +54,14 @@
     {
         token = await _localStorage.GetItemAsStringAsync("token");
 
-        var interests = await _interestManager.GetInterests();      
-        if(interests != null)
+        var interests = await _interestManager.GetInterests();
+        if (interests != null)
         {
             allInterests = interests;
         }
 
         var uInterests = await _interestManager.GetUserInterests(token);
-        if(uInterests != null)
+        if (uInterests != null)
         {
             userInterests = uInterests;
         }
@@ -73,5 +71,5 @@
     {
         _navigationManager.NavigateTo("threads");
     }
-   
+
 }

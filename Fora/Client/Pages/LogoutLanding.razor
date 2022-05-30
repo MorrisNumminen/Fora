@@ -5,19 +5,17 @@
 @using Fora.Shared
 @using Blazored.LocalStorage
 
-@if(Message != null)
+@if (Message != null)
 {
     <h3>User Was @Message</h3>
 }
 
 
-
-
-@if(loginStatus != null && loginStatus.IsBanned)
+@if (loginStatus != null && loginStatus.IsBanned)
 {
     <h3>Click the button below to get unbanned or go to User Settings and Unban there</h3>
     <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
-    
+
 }
 
 
@@ -33,13 +31,9 @@
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         loginStatus = await UserManager.CheckUserLogin(token);
-
-
     }
 
-
-
-     public void UnbanUser()
+    public void UnbanUser()
     {
         UserManager.UnbanUser(token);
         NavigationManager.NavigateTo("usersettings");

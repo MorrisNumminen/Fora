@@ -104,12 +104,9 @@ namespace Fora.Server.Controllers
             }
         }
 
-
-
         [HttpPost("removeuserinterest")]
         public async Task RemoveUserInterest([FromBody] UserInterestDto userInterest, [FromQuery] string token)
-        {
-           
+        {          
             var authUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == authUser.UserName);
 

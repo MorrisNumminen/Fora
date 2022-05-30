@@ -11,111 +11,112 @@
 @page "/usersettings"
 
 
-@if(loginStatus != null && loginStatus.IsLoggedIn)
+@if (loginStatus != null && loginStatus.IsLoggedIn)
 {
     <h3 class="text-center">You're logged in!</h3>
 
 
+    <div class="row">
+        <div class="col-3">
+            <h4>Interests</h4>
+            <h5>@loadingMessage</h5>
+            <ul>
 
-    
-<div class="row">
-<div class="col-3">
-<h4>Interests</h4>
-<h5>@loadingMessage</h5>
-<ul>
-    
-    @foreach (var interest in interests)
-    {
-    
-        <li><em>@interest.Name </em>
-            <button class="btn btn-outline-success" @onclick="() => AddInterest(interest.Id)"> Add To Favorites </button>
-        </li>
-            if(interest != null && interest.User.Username == authUser.UserName)
-            {                       
-                <btn class="btn btn-outline-info" @onclick="() => DeleteInterest(interest.Id)" >Delete Interest</btn>                      
-            }        
-    }
-</ul>
-</div>
+                @foreach (var interest in interests)
+                {
+
+                    <li>
+                        <em>@interest.Name </em>
+                        <button class="btn btn-outline-success" @onclick="() => AddInterest(interest.Id)"> Add To Favorites </button>
+                    </li>
+                    if (interest != null && interest.User.Username == authUser.UserName)
+                    {
+                        <btn class="btn btn-outline-info" @onclick="() => DeleteInterest(interest.Id)">Delete Interest</btn>
+                    }
+                }
+            </ul>
+        </div>
 
 
-<div class="col-3">
+        <div class="col-3">
 
-    <h4>My Threads</h4>
-        <ul>
-            @foreach(var thread in userThreads)
-            {
-                    if(thread != null)
+            <h4>My Threads</h4>
+            <ul>
+                @foreach (var thread in userThreads)
+                {
+                    if (thread != null)
                     {
                         <li><a href="thread/@thread.Id">@thread.Name</a></li>
-                    }                
-            }
-        </ul>
+                    }
+                }
+            </ul>
+        </div>
 
-</div>
-@*Favorite Lista*@
+        <div class="col-3">
+            <h4>Favorite Interests</h4>
+            <ul>
+                @foreach (var favo in userInterests)
+                {
 
-    <div class="col-3">
-        <h4>Favorite Interests</h4>
-        <ul>
-            @foreach(var favo in userInterests)
-            {
-                
-                <li><em>@favo.Interest.Name </em><button onclick="@(() => RemoveUserInterest(favo.InterestId))" 
-                class="btn btn-outline-danger"> Remove </button></li>
+                    <li>
+                        <em>@favo.Interest.Name </em><button onclick="@(() => RemoveUserInterest(favo.InterestId))"
+                                                     class="btn btn-outline-danger">
+                            Remove
+                        </button>
+                    </li>
 
-            }
-        </ul>
+                }
+            </ul>
 
 
+
+        </div>
+    </div>
+
+    <h2> Create a new interest</h2>
+    <EditForm Model="@Interest" OnValidSubmit="CreateNewInterest">
+        <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
+        <button type="submit">Create</button>
+    </EditForm>
+
+
+
+    // ----------------------------------------------------------------------
+    // -------------------- User Settings
+    <div class="row">
+        <h3>Change Password, Delete User and Flag User</h3>
+        <EditForm Model=@User OnSubmit="ChangePassword">
+            <div class="col-2">
+
+                <label>Current password:</label>
+                <InputText type="password" @bind-Value="User.Password"></InputText>
+                <br />
+                <label>New password:</label>
+                <InputText type="password" @bind-Value="newPassword" />
+                <br />
+                <label>Confirm Password:</label>
+                <InputText type="password" @bind-Value="confirmPassword" />
+                <input type="submit" class="btn-outline-primary" value="Change password" />
+                <a>@Message</a>
+            </div>
+        </EditForm>
+
+        <div class="col-4"></div>
+        <div class="col-2">
+            @*Delete User *@
+            <button class="btn-outline-danger" @onclick="DeleteUser">Delete User</button>
+            <br />
+            @*Ban User *@
+            <button class="btn-outline-warning" @onclick="BanUser">Ban User</button>
+            <br />
+            @*Unban User*@
+
+        </div>
 
     </div>
-</div>
-
-<h2> Create a new interest</h2>
-<EditForm Model="@Interest" OnValidSubmit="CreateNewInterest">
-    <InputText @bind-Value="Interest.Name" type="text" placeholder="Name of interest"></InputText>
-    <button type="submit">Create</button>
-</EditForm>
-
-
-
-// ----------------------------------------------------------------------
-// -------------------- User Settings
-<div class="row">
-<h3>Change Password, Delete User and Flag User</h3>
-<EditForm Model=@User OnSubmit="ChangePassword">
-<div class="col-2">  
-
-    <label>Current password:</label>
-    <InputText type="password" @bind-Value="User.Password"></InputText>
-    <br />
-        <label>New password:</label>
-    <InputText type="password" @bind-Value="newPassword" />
-    <br />
-    <label>Confirm Password:</label>
-    <InputText type="password" @bind-Value="confirmPassword" />
-    <input type="submit" class="btn-outline-primary" value="Change password" />
-    <a>@Message</a>
-</div>
-</EditForm>
- 
-<div class="col-4"></div>
-<div class="col-2">
-    @*Delete User *@
-    <button class="btn-outline-danger" @onclick="DeleteUser">Delete User</button>
-    <br />    
-    @*Ban User *@
-    <button class="btn-outline-warning" @onclick="BanUser">Ban User</button>
-    <br />
-    @*Unban User*@
-    
-</div>
-   
-</div>   
 }
 
-@if(loginStatus != null && loginStatus.IsBanned)
+@if (loginStatus != null && loginStatus.IsBanned)
 {
     <h3>This user has been flagged as Banned</h3>
     <button class="btn-outline-success" @onclick="UnbanUser">Unban User</button>
@@ -129,7 +130,7 @@
 
     public InterestModel Interest { get; set; } = new();
     public ApplicationUser authUser { get; set; }
-    public UserModel dbUser {get; set;}
+    public UserModel dbUser { get; set; }
     public List<UserInterestModel> userInterests = new();
     public List<ThreadModel> myThreads = new();
     public List<ThreadModel> userThreads = new();
@@ -162,7 +163,7 @@
         userThreads = await ThreadManager.GetThreads();
         userThreads = userThreads.Where(x => x.User.Username == authUser.UserName).ToList();
         loadingMessage = "Loading interests...";
-        interests = await InterestManager.GetInterests();       
+        interests = await InterestManager.GetInterests();
 
         loadingMessage = "Finished loading!";
     }
@@ -171,7 +172,7 @@
 
     private async Task AddInterest(int id)
     {
-        
+
         await InterestManager.AddUserInterests(id, token);
         userInterests = await InterestManager.GetUserInterests(token);
         StateHasChanged();
@@ -179,19 +180,19 @@
 
     private async Task DeleteInterest(int id)
     {
-            await InterestManager.DeleteInterest(id);
-            interests = await InterestManager.GetInterests();       
-            StateHasChanged();
+        await InterestManager.DeleteInterest(id);
+        interests = await InterestManager.GetInterests();
+        StateHasChanged();
     }
 
     public async Task RemoveUserInterest(int id)
     {
-            var removeInterest = userInterests.FirstOrDefault(x => x.UserId == dbUser.Id);
+        var removeInterest = userInterests.FirstOrDefault(x => x.UserId == dbUser.Id);
 
-            await InterestManager.RemoveUserInterests(removeInterest, token);
-            userInterests = await InterestManager.GetUserInterests(token);
-            StateHasChanged();
-        
+        await InterestManager.RemoveUserInterests(removeInterest, token);
+        userInterests = await InterestManager.GetUserInterests(token);
+        StateHasChanged();
+
     }
 
     public async Task CreateNewInterest()
@@ -216,7 +217,7 @@
 
     public async Task BanUser()
     {
-        await UserManager.BanUser(token);        
+        await UserManager.BanUser(token);
         string action = "Banned";
         NavigationManager.NavigateTo($"LogoutLanding/{action}", true);
 
@@ -237,14 +238,14 @@
 
         string token = await LocalStorage.GetItemAsStringAsync("token");
 
-        if(newPassword == confirmPassword && token != null)
+        if (newPassword == confirmPassword && token != null)
         {
             await UserManager.ChangePasswordUser(User, newPassword, token);
             Message = "Password Changed";
         }
     }
 
-   
+
 }
 
 

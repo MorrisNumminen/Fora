@@ -49,8 +49,6 @@ namespace Fora.Server.Controllers
             return BadRequest("Could not create thread");
         }
 
-
-
         //GET messages related to thread
         [HttpGet("getthreadmessages/{threadId}")]
         public async Task<List<MessageModel>> GetThreadMessages(int threadId)

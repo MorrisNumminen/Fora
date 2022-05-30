@@ -15,7 +15,6 @@ namespace Fora.Server.Controllers
         private readonly AppDbContext _context;
         private readonly AuthDbContext _authContext;
   
-
         public UsersController(SignInManager<ApplicationUser> signInManager, AppDbContext context, AuthDbContext authContext)
         {
             _signInManager = signInManager;
@@ -91,10 +90,6 @@ namespace Fora.Server.Controllers
 
             return BadRequest("Could not login");
         }
-
-
-
-
 
         [HttpGet("check/{token}")]
         public async Task<ActionResult<LoginDto>> CheckUserLogin([FromRoute] string token)

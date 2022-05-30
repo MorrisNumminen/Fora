@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Fora.Server.Migrations.AuthDb
 {
-    public partial class InitialCreate : Migration
+    public partial class AuthInitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

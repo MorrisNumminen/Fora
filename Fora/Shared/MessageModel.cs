@@ -14,8 +14,6 @@ namespace Fora.Shared
         public bool EditStage { get; set; }
         public bool Deleted { get; set; }
 
-
-
         // Relations
         [ForeignKey(nameof(Thread))]
         public int? ThreadId { get; set; }

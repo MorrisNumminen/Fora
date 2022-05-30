@@ -102,7 +102,6 @@ SearchMethod
 }
 
 
-
 @code {
     public List<ThreadModel> SearchList { get; set; } = new();
     public string SearchWord { get; set; } = String.Empty;
@@ -146,10 +145,6 @@ SearchMethod
             thread.MessageCount = MessageCount;
         }
 
-
-
-
-
         token = await LocalStorage.GetItemAsStringAsync("token");
 
         CurrentUser = await UserManager.GetAsync(token);
@@ -187,7 +182,6 @@ SearchMethod
 
         }
 
-
         switch (SearchDto.SortMethod)
         {
             case "az":
@@ -208,7 +202,6 @@ SearchMethod
         }
         StateHasChanged();
     }
-
 
     private void ToggleCreateThread()
     {

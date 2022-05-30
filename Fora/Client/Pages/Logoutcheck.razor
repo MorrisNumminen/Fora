@@ -11,29 +11,24 @@
 @page "/logoutcheck"
 
 <div class="text-center">
-<h2>Are you sure you want to logout?</h2>
+    <h2>Are you sure you want to logout?</h2>
 
-<button class="btn-outline-danger" @onclick="LogOutUser">Yes, I want to Logout</button>
-<button class="btn-outline-success" @onclick="BackToIndex">No, take me back to Home Page!</button>
+    <button class="btn-outline-danger" @onclick="LogOutUser">Yes, I want to Logout</button>
+    <button class="btn-outline-success" @onclick="BackToIndex">No, take me back to Home Page!</button>
 
 </div>
-
-
-
-
-
 
 
 @code {
 
     private string? token;
 
-     private async Task LogOutUser()
-     {
+    private async Task LogOutUser()
+    {
         await UserManager.LogOutUser(token);
         var message = "Logged out";
         NavigationManager.NavigateTo($"LogoutLanding/{message}", true);
-     }
+    }
 
     private async Task BackToIndex()
     {

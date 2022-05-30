@@ -63,12 +63,8 @@ namespace Fora.Client.Services
         }
          
         public async Task<LoginDto> CheckUserLogin(string token)
-        {
-         
-
-            // Use token to check user status (logged in, admin, banned, deleted...)
-
-           
+        {       
+            // Use token to check user status (logged in, admin, banned, deleted...)           
             var loginResponse = await _http.GetAsync($"api/users/check/{token}");
 
 
@@ -108,6 +104,5 @@ namespace Fora.Client.Services
 
             var changePasswordResponse = await _http.PutAsJsonAsync($"api/users/change?newPassword={newPassword}&token={token}", user);
         }
-
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fora.Server.Migrations.AuthDb
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20220530202723_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220530213504_AuthInitialCreate")]
+    partial class AuthInitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
