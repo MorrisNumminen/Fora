@@ -172,9 +172,9 @@ SearchMethod
                 SearchList = tempList.Where(a => a.Name.ToLower().Contains(SearchDto.SearchWord.ToLower())).ToList();
             }
             //Search by interest name
-            else if(SearchDto.SearchMethod == "interest")
+            else if(SearchDto.SearchMethod == "interest" && SearchDto.SearchWord != "")
             {
-                InterestModel interest = allInterests.FirstOrDefault(i => i.Name.ToLower().Contains(SearchWord.ToLower()));
+                InterestModel interest = allInterests.FirstOrDefault(i => i.Name.ToLower().Contains(SearchDto.SearchWord.ToLower()));
                 if(interest != null)
                 {
                     SearchList = tempList.Where(t => t.InterestId == interest.Id).ToList();

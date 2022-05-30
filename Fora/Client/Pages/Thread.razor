@@ -114,7 +114,7 @@ body {
     public string TestMessage { get; set; } = String.Empty;
     public int EditValue { get; set; }
     public string Color { get; set; }
-    
+
 
     public List<MessageModel> Messages = new();
 
@@ -132,7 +132,7 @@ body {
         Messages.Reverse();
     }
 
-  
+
 
     public async Task CreateMessage()
     {
@@ -155,6 +155,7 @@ body {
     {
         var message = Messages.Find(m => m.Id == messageId);
         message.EditStage = true;
+        EditedMessage.Message = message.Message;
     }
 
     public async Task SaveMessage(int id)
