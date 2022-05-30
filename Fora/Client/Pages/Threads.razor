@@ -77,8 +77,14 @@ SearchMethod
 
 @foreach(var thread in ThreadsList)
 {
+<<<<<<< HEAD
     //Console.WriteLine(NumberOfMsgsList[counter]);
     @if(thread.User != null)
+=======
+    <div>
+        @*<a> @Interest.Name</a>*@
+        @if(thread.User != null)
+>>>>>>> parent of edfc41b (Fixed the counter)
         {
             @if(CurrentUser.UserName == thread.User.Username)
             {
@@ -92,6 +98,7 @@ SearchMethod
                 }
             }
         }
+<<<<<<< HEAD
         @if(counter == NumberOfMsgsList.Count())
         {
             counter = 0;
@@ -104,6 +111,10 @@ SearchMethod
         <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>
        <p>Messages: @NumberOfMsgsList[counter]</p>
         counter++;
+=======
+        <a class="btn-outline-light" href="thread/@thread.Id">@thread.Name</a>        
+    </div>
+>>>>>>> parent of edfc41b (Fixed the counter)
     <br/>
 }
 
@@ -147,9 +158,12 @@ SearchMethod
 
     protected override async Task OnInitializedAsync()
     {
-        PlaceHolderID = 1;
         //    return base.OnInitializedAsync();
         ThreadsList = await ThreadManager.GetThreads();
+        foreach(ThreadModel thread in ThreadsList)
+        {
+            
+        }
         //ThreadsList.Sort();
         token = await LocalStorage.GetItemAsStringAsync("token");
 
@@ -157,7 +171,6 @@ SearchMethod
         loginStatus = await UserManager.CheckUserLogin(token);
 
         allInterest = await InterestManager.GetInterests();
-        await MsgCounter();
     }
 
     public async Task GetSearchList()

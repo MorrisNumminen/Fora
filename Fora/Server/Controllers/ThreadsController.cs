@@ -55,19 +55,9 @@ namespace Fora.Server.Controllers
         [HttpGet("getthreadmessages/{threadId}")]
         public async Task<List<MessageModel>> GetThreadMessages(int threadId)
         {
-
-            List<MessageModel> messages =  _dbContext.Messages.Include(x => x.User).Where(x => x.ThreadId == threadId).Select(x => new MessageModel
-            {
-
-                Message = x.Message,
-                User = new UserModel()
-                {
-                    Id = x.User.Id,
-                    Username = x.User.Username,
-                    Banned = x.User.Banned,
-                    Deleted = x.User.Deleted,
-                }
-            }).ToList();
+                       
+            List<MessageModel> messages = await _dbContext.Messages.Include(x => x.User).ToListAsync();
+            messages = messages.Where(m => m.ThreadId == threadId).ToList();
 
             return messages;
         }
