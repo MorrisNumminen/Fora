@@ -119,15 +119,6 @@ namespace Fora.Server.Controllers
             return BadRequest("User not found");
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-
-
-
-        }
-
         [HttpGet("ban/{token}")]
         public async Task<ActionResult> BanUser(string token)
         {

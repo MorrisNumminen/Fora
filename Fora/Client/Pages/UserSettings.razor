@@ -32,7 +32,7 @@
         </li>
             if(interest != null && interest.User.Username == authUser.UserName)
             {                       
-                <btn class="btn btn-outline-info" @onclick="() => RemoveUserInterest(interest.Id)" >Delete Interest</btn>                      
+                <btn class="btn btn-outline-info" @onclick="() => DeleteInterest(interest.Id)" >Delete Interest</btn>                      
             }        
     }
 </ul>
@@ -168,14 +168,16 @@
 
     private async Task AddInterest(int id)
     {
-        var ui = interests.FirstOrDefault(ui => ui.Id == id);
+        await InterestManager.AddUserInterests(id, token);
+        userInterests = await InterestManager.GetUserInterests(token);
+        StateHasChanged();
+    }
 
-        if(ui != null )
-        {
-            await InterestManager.AddUserInterests(ui, token);
-            userInterests = await InterestManager.GetUserInterests(token);
+    private async Task DeleteInterest(int id)
+    {
+            await InterestManager.DeleteInterest(id);
+            interests = await InterestManager.GetInterests();       
             StateHasChanged();
-        }
     }
 
     public async Task RemoveUserInterest(int id)

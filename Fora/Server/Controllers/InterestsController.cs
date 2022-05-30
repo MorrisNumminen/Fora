@@ -29,18 +29,19 @@ namespace Fora.Server.Controllers
         }
 
         [HttpPost("AddUserInterest")]
-        public async Task<ActionResult<List<InterestModel>>> AddUserInterest([FromQuery] string token, [FromBody] InterestModel interest)
+        public async Task<ActionResult> AddUserInterest([FromBody] int interestId,[FromQuery] string token)
         {
             var identityUser = _signInManager.UserManager.Users.FirstOrDefault(u => u.Token == token);
             var dbUser = _dbContext.Users.FirstOrDefault(u => u.Username == identityUser.UserName);
-            var dbInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interest.Id);
+            var dbInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interestId);
 
             if (dbUser != null && dbInterest != null)
             {
                 UserInterestModel userInterest = new UserInterestModel()
                 {
                     UserId = dbUser.Id,
-                    InterestId = dbInterest.Id
+                    InterestId = dbInterest.Id,
+                    Interest = dbInterest
                 };
 
                 _dbContext.UserInterests.Add(userInterest);
@@ -89,7 +90,20 @@ namespace Fora.Server.Controllers
 
         }
 
-       
+        [HttpDelete("deleteinterest/{interestId}")]
+        public async Task DeleteInterest(int interestId)
+        {
+
+            var dbDeleteInterest = _dbContext.Interests.FirstOrDefault(i => i.Id == interestId);
+
+            if (dbDeleteInterest != null)
+            {
+                _dbContext.Interests.Remove(dbDeleteInterest);
+
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
 
 
         [HttpPost("removeuserinterest")]

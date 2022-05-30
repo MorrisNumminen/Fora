@@ -25,10 +25,18 @@ namespace Fora.Client.Services
             return null;
         }
 
-        public async Task AddUserInterests(InterestModel interest, string token)
+        public async Task DeleteInterest(int interestId)
         {
-             var response = await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/AddUserInterest?token={token}", interest);
+            // Ta bort ett interest i db
+            var response = await _httpClient.DeleteAsync($"api/Interests/deleteinterest/{interestId}");
         }
+        
+
+        public async Task AddUserInterests(int interestId, string token)
+        {
+             var response = await _httpClient.PostAsJsonAsync<int>($"api/Interests/AddUserInterest?token={token}", interestId);
+        }
+
         public async Task RemoveUserInterests(InterestModel removeInterest, string token)
         {
              await _httpClient.PostAsJsonAsync<InterestModel>($"api/Interests/RemoveUserInterest?token={token}", removeInterest);

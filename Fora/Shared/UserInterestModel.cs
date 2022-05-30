@@ -9,7 +9,7 @@ namespace Fora.Shared
         public UserModel? User { get; set; }
 
         [ForeignKey(nameof(Interest))]
-        public int? InterestId { get; set; }
+        public int InterestId { get; set; }
         public InterestModel? Interest { get; set; }
     }
 }
